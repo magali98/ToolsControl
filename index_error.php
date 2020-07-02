@@ -126,7 +126,7 @@ if (isset($_POST['usuario'])) {
                                 <div class="bg-white p-4 mt-4 rounded">
                                     <div class="text-center">
                                         <h1 class="black-text">| Tools Control |</h1>
-                                        <p class="text-black-50 text-center">Inicia sesión para continuar.</p>
+                                        <p class="text-black-50 text-center"><font color="#FF050A" >¡Usuario o contraseña incorrecto! </font> </p>
                                     </div>
                                     <form METHOD="POST" class="login-form" action="<?php echo $loginFormAction; ?>" name="login">
                                         <div class="row">
