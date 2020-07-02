@@ -31,7 +31,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "2";
+$MM_authorizedUsers = "3,1";
 $MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
@@ -110,7 +110,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
 }
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")) {
-  $insertSQL = sprintf("INSERT INTO Productos_almacen1 (id, producto, cantidad, descripcion, costo, categoria, uso, fecha_alta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+  $insertSQL = sprintf("INSERT INTO Productos_almacen2 (id, producto, cantidad, descripcion, costo, categoria, uso, fecha_alta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                        GetSQLValueString($_POST['id_producto'], "text"),
                        GetSQLValueString($_POST['nombre_producto'], "text"),
                        GetSQLValueString($_POST['cantidad_producto'], "int"),
@@ -118,12 +118,12 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                        GetSQLValueString($_POST['costo'], "text"),
                        GetSQLValueString($_POST['categoria'], "text"),
                        GetSQLValueString($_POST['uso'], "text"),
-                       GetSQLValueString($_POST['fecha'], "date"));
+                       GetSQLValueString($_POST['fecha'], "text"));
 
   mysql_select_db($database_conexion, $conexion);
   $Result1 = mysql_query($insertSQL, $conexion) or die(mysql_error());
 
-  $insertGoTo = "agregar_producto_exito.php";
+  $insertGoTo = "agregar_producto_exito_almacen2.php";
   if (isset($_SERVER['QUERY_STRING'])) {
     $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
     $insertGoTo .= $_SERVER['QUERY_STRING'];
@@ -145,7 +145,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
         <!-- Begin page -->
         <div id="wrapper">
 
-        <?php include 'layouts/navbar_almacen1.php'; ?>
+        <?php include 'layouts/navbar_almacen2.php'; ?>
 
             <!-- Start right Content here -->
             <div class="content-page">

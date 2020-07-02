@@ -31,7 +31,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "2";
+$MM_authorizedUsers = "1,4";
 $MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
@@ -104,38 +104,19 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
-}
-
-if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")) {
-  $insertSQL = sprintf("INSERT INTO Productos_almacen1 (id, producto, cantidad, descripcion, costo, categoria, uso, fecha_alta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                       GetSQLValueString($_POST['id_producto'], "text"),
-                       GetSQLValueString($_POST['nombre_producto'], "text"),
-                       GetSQLValueString($_POST['cantidad_producto'], "int"),
-                       GetSQLValueString($_POST['descripcion'], "text"),
-                       GetSQLValueString($_POST['costo'], "text"),
-                       GetSQLValueString($_POST['categoria'], "text"),
-                       GetSQLValueString($_POST['uso'], "text"),
-                       GetSQLValueString($_POST['fecha'], "date"));
-
-  mysql_select_db($database_conexion, $conexion);
-  $Result1 = mysql_query($insertSQL, $conexion) or die(mysql_error());
-
-  $insertGoTo = "agregar_producto_exito.php";
-  if (isset($_SERVER['QUERY_STRING'])) {
-    $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
-    $insertGoTo .= $_SERVER['QUERY_STRING'];
-  }
-  header(sprintf("Location: %s", $insertGoTo));
-}
+mysql_select_db($database_conexion, $conexion);
+$query_consulta = "SELECT * FROM Productos_almacen3";
+$consulta = mysql_query($query_consulta, $conexion) or die(mysql_error());
+$row_consulta = mysql_fetch_assoc($consulta);
+$totalRows_consulta = mysql_num_rows($consulta);
 ?>
 <?php include 'layouts/header.php'; ?>
 
-    <!-- Select 2 -->
-    <link href="public/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
-
+        <!-- DataTables -->
+        <link href="public/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+        <!-- Responsive datatable examples -->
+        <link href="public/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+     
 <?php include 'layouts/headerStyle.php'; ?>
 
     <body class="fixed-left">
@@ -145,7 +126,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
         <!-- Begin page -->
         <div id="wrapper">
 
-        <?php include 'layouts/navbar_almacen1.php'; ?>
+        <?php include 'layouts/navbar.php'; ?>
 
             <!-- Start right Content here -->
             <div class="content-page">
@@ -224,14 +205,14 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                             <p class="notify-details"><b>Your item is shipped</b><small class="text-muted">It is a long established fact that a reader will</small></p>
                                         </a>
 
-
+                                        
                                         <a href="javascript:void(0);" class="dropdown-item notify-item">
                                             View All
                                         </a>
 -->
                                     </div>
                                 </li>
-                                <!-- User-->
+                                 <!-- User-->
                                 <li class="list-inline-item dropdown notification-list">
                                     <a class="nav-link dropdown-toggle arrow-none waves-effect nav-user" data-toggle="dropdown" href="#" role="button"
                                        aria-haspopup="false" aria-expanded="false">
@@ -248,6 +229,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                 </li>
                             </ul>
 
+
                             <!-- Page title -->
                             <ul class="list-inline menu-left mb-0">
                                 <li class="list-inline-item">
@@ -256,19 +238,13 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                     </button>
                                 </li>
                                 <li class="hide-phone list-inline-item app-search">
-                                    <h3 class="page-title">Agregar producto</h3>
+                                    <h3 class="page-title">Consultar Productos</h3>
                                 </li>
                             </ul>
 
                             <div class="clearfix"></div>
                         </nav>
-
                     </div>
-                    <!-- Top Bar End -->
-
-                    <!-- ==================
-                         PAGE CONTENT START
-                         ================== -->
 
                     <div class="page-content-wrapper">
 
@@ -276,135 +252,43 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
 
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="card m-b-20">
+                                    <div class="card">
                                         <div class="card-body">
-
-                                            <h4 class="mt-0 header-title">Información</h4>
-                                            <p class="text-muted m-b-30 font-14">Completar todos los campos listados a continuación: </p>
-
-                                            <form method="POST" action="<?php echo $editFormAction; ?>" name="ingresar_producto">
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-														<div class="form-group">
-                                                            <label for="productname">Id del producto</label>
-                                                            <input id="idname" name="id_producto" type="text" class="form-control">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="productname">Nombre del producto</label>
-                                                            <input id="productname" name="nombre_producto" type="text" class="form-control">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="manufacturername">Cantidad</label>
-                                                            <input id="manufacturername" name="cantidad_producto" type="text" class="form-control">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="productdesc">Descripción</label>
-                                                            <textarea class="form-control" id="productdesc" name="descripcion" rows="5"></textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="manufacturerbrand">Costo</label>
-                                                            <input id="manufacturerbrand" name="costo" type="text" class="form-control">
-                                                        </div>
-                                                       <!-- <div class="form-group">
-                                                            <label for="price">Price</label>
-                                                            <input id="price" name="price" type="text" class="form-control">
-                                                        </div> -->
-
-                                                        <div class="form-group">
-                                                            <label class="control-label">Categoria</label>
-                                                            <select class="form-control select2" name="categoria">
-                                                                <option>Seleccionar</option>
-                                                                <option value="Eléctrica">Eléctrica</option>
-                                                                <option value="Manual">Manual</option>
-                                                                <option value="Neumática">Neumática</option>
-                                                                <option value="Mecánica">Mecánica</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label">Tipo de uso</label>
-                                                            <select class="form-control select2" name="uso">
-                                                                <option>Seleccionar</option>
-                                                                <option value="Consumible">Consumible</option>
-                                                                <option value="Activo Fijo">Activo Fijo</option>
-
-                                                            </select>
-                                                        </div>
-                                                       <!-- <div class="form-group">
-                                                            <label class="control-label">Features</label>
-
-                                                            <select class="select2 form-control select2-multiple" multiple="multiple" data-placeholder="Choose ...">
-                                                                <option value="AK">Alaska</option>
-                                                                <option value="HI">Hawaii</option>
-                                                                <option value="CA">California</option>
-                                                                <option value="NV">Nevada</option>
-                                                                <option value="OR">Oregon</option>
-                                                                <option value="WA">Washington</option>
-                                                            </select>
-
-                                                        </div> -->
-                                                    </div>
-
-                                                   <!-- <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label>Product Image</label> <br/>
-                                                            <img src="public/assets/images/products/1.jpg" alt="product img" class="img-fluid" style="max-width: 200px;" />
-                                                            <br/>
-                                                            <button type="button" class="btn btn-purple m-t-10 waves-effect waves-light">Change Image</button>
-                                                        </div>
-                                                    </div> -->
-                                                </div>
-												<?php $la = date("d / m / Y"); ?>
-												<input type="hidden" name="fecha" value="<?php echo $la ; ?>"  >
-
-                                                <button type="submit" class="btn btn-success waves-effect waves-light">Agregar</button>
-                                                <button type="submit" class="btn btn-secondary waves-effect">Cancelar</button>
-                                                <input type="hidden" name="MM_insert" value="ingresar_producto">
-                                            </form>
+                                          
+                                          <table id="datatable" class="table table-striped dt-responsive nowrap table-vertical" width="100%" cellspacing="0">
+                                              <thead>
+                                                <tr>
+                                                  <th>Id</th>
+                                                  <th>Nombre</th>
+                                                  <th>Cantidad</th>
+                                                  <th>Descripción</th>
+                                                  <th>Costo</th>
+                                                  <th>Fecha de alta</th>
+                                                  <th>Acción</th>
+                                                  </tr>
+                                                </thead>
+                                              <tbody>
+												  <?php do { ?>
+                                                <tr>
+                                                  <td><?php echo $row_consulta['id']; ?></td>
+                                                  <td><?php echo $row_consulta['producto']; ?></td>
+                                                  <td><?php echo $row_consulta['cantidad']; ?></td>
+                                                  <td><?php echo $row_consulta['descripcion']; ?> </td>
+                                                  <td>$<?php echo $row_consulta['costo']; ?>  </td>
+                                                  <td><?php echo $row_consulta['fecha_alta']; ?></td>
+                                                  <td>
+                                                    <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
+                                                    <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
+                                                    </td>
+                                                  </tr>
+                                                <?php } while ($row_consulta = mysql_fetch_assoc($consulta)); ?>
+                                                
+                                              </tbody>
+                                            </table>
+                                            
+                                            
 
                                         </div>
-                                    </div>
-
-                                   <!-- <div class="card">
-                                        <div class="card-body">
-
-                                            <h4 class="mt-0 header-title">Meta Data</h4>
-                                            <p class="text-muted m-b-30 font-14">Fill all information below</p>
-
-                                            <form>
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="metatitle">Meta title</label>
-                                                            <input id="metatitle" name="productname" type="text" class="form-control">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="metakeywords">Meta Keywords</label>
-                                                            <input id="metakeywords" name="manufacturername" type="text" class="form-control">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="metadescription">Meta Description</label>
-                                                            <textarea class="form-control" id="metadescription" rows="5"></textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <button type="submit" class="btn btn-success waves-effect waves-light">Save Changes</button>
-                                                <button type="submit" class="btn btn-secondary waves-effect">Cancel</button>
-
-                                            </form>
-
-                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -425,16 +309,24 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
 
         <?php include 'layouts/footerScript.php'; ?>
 
-        <!-- select2 js -->
-        <script src="public/plugins/select2/js/select2.min.js"></script>
+        <!-- Datatable js -->
+        <script src="public/plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="public/plugins/datatables/dataTables.bootstrap4.min.js"></script>
+        <!-- Responsive examples -->
+        <script src="public/plugins/datatables/dataTables.responsive.min.js"></script>
+        <script src="public/plugins/datatables/responsive.bootstrap4.min.js"></script>
 
         <!-- App js -->
         <script src="public/assets/js/app.js"></script>
 
         <script>
-            // Select2
-            $(".select2").select2();
+            $(document).ready(function () {
+                $('#datatable').DataTable();
+            });
         </script>
 
     </body>
 </html>
+<?php
+mysql_free_result($consulta);
+?>

@@ -31,7 +31,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "1";
+$MM_authorizedUsers = "4";
 $MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
@@ -60,7 +60,7 @@ function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) {
   return $isValid; 
 }
 
-$MM_restrictGoTo = "index_almacen1.php";
+$MM_restrictGoTo = "index_user.php";
 if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
   $MM_qsChar = "?";
   $MM_referrer = $_SERVER['PHP_SELF'];
@@ -115,10 +115,10 @@ $row_Usuario = mysql_fetch_assoc($Usuario);
 $totalRows_Usuario = mysql_num_rows($Usuario);
 
 mysql_select_db($database_conexion, $conexion);
-$query_almacen1 = "SELECT * FROM Productos_almacen1";
-$almacen1 = mysql_query($query_almacen1, $conexion) or die(mysql_error());
-$row_almacen1 = mysql_fetch_assoc($almacen1);
-$totalRows_almacen1 = mysql_num_rows($almacen1);
+$query_almacen3 = "SELECT * FROM Productos_almacen3";
+$almacen3 = mysql_query($query_almacen3, $conexion) or die(mysql_error());
+$row_almacen3 = mysql_fetch_assoc($almacen3);
+$totalRows_almacen3 = mysql_num_rows($almacen3);
 
 mysql_select_db($database_conexion, $conexion);
 $query_contar_usuarios = "SELECT * FROM Usuarios";
@@ -139,7 +139,7 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
         <!-- Begin page -->
         <div id="wrapper">
 
-        <?php include 'layouts/navbar.php'; ?>
+        <?php include 'layouts/navbar_almacen3.php'; ?>
 
             <!-- Start right Content here -->
             <div class="content-page">
@@ -273,11 +273,11 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
                                     <div class="mini-stat clearfix bg-white">
                                         <span class="mini-stat-icon bg-purple mr-0 float-right"><i class="mdi mdi-basket"></i></span>
                                         <div class="mini-stat-info">
-                                            <span class="counter text-purple"><?php echo $totalRows_almacen1 ?> </span>
+                                            <span class="counter text-purple"><?php echo $totalRows_almacen3 ?></span>
                                             Productos disponibles
                                         </div>
                                         <div class="clearfix"></div>
-                                        <p class=" mb-0 m-t-20 text-muted">Productos Totales: <?php echo $totalRows_almacen1 ?> <span class="pull-right"> <!--<i class="fa fa-caret-up m-r-5"></i>10.25%</span>--></p>
+                                        <p class=" mb-0 m-t-20 text-muted">Productos Totales: <?php echo $totalRows_almacen3 ?><span class="pull-right"> <!--<i class="fa fa-caret-up m-r-5"></i>10.25%</span>--></p>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
@@ -764,7 +764,7 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
 <?php
 mysql_free_result($Usuario);
 
-mysql_free_result($almacen1);
+mysql_free_result($almacen3);
 
 mysql_free_result($contar_usuarios);
 ?>

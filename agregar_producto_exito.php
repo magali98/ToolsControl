@@ -279,8 +279,8 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                     <div class="card m-b-20">
                                         <div class="card-body">
 
-                                            <h4 class="mt-0 header-title">Información</h4>
-                                            <p class="text-muted m-b-30 font-14">Completar todos los campos listados a continuación: </p>
+                                            <h4 class="mt-0 header-title">¡Operación Exitosa!</h4>
+                                            <p class="text-muted m-b-30 font-14">Completar todos los campos listados a continuación:</p>
 
                                             <form method="POST" action="<?php echo $editFormAction; ?>" name="ingresar_producto">
                                                 <div class="row">
@@ -332,8 +332,9 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                                             <label class="control-label">Tipo de uso</label>
                                                             <select class="form-control select2" name="uso">
                                                                 <option>Seleccionar</option>
-                                                                <option value="Consumible">Consumible</option>
+                                                               <option value="Consumible">Consumible</option>
                                                                 <option value="Activo Fijo">Activo Fijo</option>
+
 
                                                             </select>
                                                         </div>
@@ -361,9 +362,10 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                                         </div>
                                                     </div> -->
                                                 </div>
+
 												<?php $la = date("d / m / Y"); ?>
 												<input type="hidden" name="fecha" value="<?php echo $la ; ?>"  >
-
+												
                                                 <button type="submit" class="btn btn-success waves-effect waves-light">Agregar</button>
                                                 <button type="submit" class="btn btn-secondary waves-effect">Cancelar</button>
                                                 <input type="hidden" name="MM_insert" value="ingresar_producto">

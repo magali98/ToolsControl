@@ -20,7 +20,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
   unset($_SESSION['MM_UserGroup']);
   unset($_SESSION['PrevUrl']);
 	
-  $logoutGoTo = "index.php";
+  $logoutGoTo = "index_user.php";
   if ($logoutGoTo) {
     header("Location: $logoutGoTo");
     exit;
@@ -31,7 +31,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "2";
+$MM_authorizedUsers = "1";
 $MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
@@ -60,7 +60,7 @@ function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) {
   return $isValid; 
 }
 
-$MM_restrictGoTo = "index_admin.php";
+$MM_restrictGoTo = "index_user.php";
 if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
   $MM_qsChar = "?";
   $MM_referrer = $_SERVER['PHP_SELF'];
@@ -109,21 +109,19 @@ if (isset($_SERVER['QUERY_STRING'])) {
   $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
 
-if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")) {
-  $insertSQL = sprintf("INSERT INTO Productos_almacen1 (id, producto, cantidad, descripcion, costo, categoria, uso, fecha_alta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-                       GetSQLValueString($_POST['id_producto'], "text"),
-                       GetSQLValueString($_POST['nombre_producto'], "text"),
-                       GetSQLValueString($_POST['cantidad_producto'], "int"),
-                       GetSQLValueString($_POST['descripcion'], "text"),
-                       GetSQLValueString($_POST['costo'], "text"),
-                       GetSQLValueString($_POST['categoria'], "text"),
-                       GetSQLValueString($_POST['uso'], "text"),
-                       GetSQLValueString($_POST['fecha'], "date"));
+if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "agregar_usuario")) {
+  $insertSQL = sprintf("INSERT INTO Usuarios (acceso, email, password, nombre, apellido, unidad_academica) VALUES (%s, %s, %s, %s, %s, %s)",
+                       GetSQLValueString($_POST['Nivel_Acceso'], "int"),
+                       GetSQLValueString($_POST['email_usuario'], "text"),
+                       GetSQLValueString($_POST['passwd_usuario'], "text"),
+                       GetSQLValueString($_POST['nombre_usuario'], "text"),
+                       GetSQLValueString($_POST['apellido_usuario'], "text"),
+                       GetSQLValueString($_POST['unidad_academica'], "text"));
 
   mysql_select_db($database_conexion, $conexion);
   $Result1 = mysql_query($insertSQL, $conexion) or die(mysql_error());
 
-  $insertGoTo = "agregar_producto_exito.php";
+  $insertGoTo = "agregar_usuario_correcto.php";
   if (isset($_SERVER['QUERY_STRING'])) {
     $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
     $insertGoTo .= $_SERVER['QUERY_STRING'];
@@ -132,7 +130,6 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
 }
 ?>
 <?php include 'layouts/header.php'; ?>
-
     <!-- Select 2 -->
     <link href="public/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
@@ -145,7 +142,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
         <!-- Begin page -->
         <div id="wrapper">
 
-        <?php include 'layouts/navbar_almacen1.php'; ?>
+        <?php include 'layouts/navbar.php'; ?>
 
             <!-- Start right Content here -->
             <div class="content-page">
@@ -256,7 +253,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                     </button>
                                 </li>
                                 <li class="hide-phone list-inline-item app-search">
-                                    <h3 class="page-title">Agregar producto</h3>
+                                    <h3 class="page-title">Agregar Usuario</h3>
                                 </li>
                             </ul>
 
@@ -279,61 +276,70 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                     <div class="card m-b-20">
                                         <div class="card-body">
 
-                                            <h4 class="mt-0 header-title">Información</h4>
-                                            <p class="text-muted m-b-30 font-14">Completar todos los campos listados a continuación: </p>
+                                            <h4 class="mt-0 header-title">¡Usuario agregado con exito!</h4>
+                                            <p class="text-muted m-b-30 font-14">Completar todos los campos listados a continuación:</p>
 
-                                            <form method="POST" action="<?php echo $editFormAction; ?>" name="ingresar_producto">
+                                            <form method="POST" action="<?php echo $editFormAction; ?>" name="agregar_usuario">
                                                 <div class="row">
                                                     <div class="col-sm-6">
-														<div class="form-group">
-                                                            <label for="productname">Id del producto</label>
-                                                            <input id="idname" name="id_producto" type="text" class="form-control">
+                                                        <div class="form-group">
+                                                            <label for="productname">Email: </label>
+                                                            <input id="email_usuario" name="email_usuario" type="text" class="form-control">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="productname">Nombre del producto</label>
-                                                            <input id="productname" name="nombre_producto" type="text" class="form-control">
+                                                            <label for="manufacturername">Password:</label>
+                                                            <input id="passwd_usuario" name="passwd_usuario" type="password" class="form-control">
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="manufacturername">Cantidad</label>
-                                                            <input id="manufacturername" name="cantidad_producto" type="text" class="form-control">
+                                                            <label for="manufacturername">Nombre:</label>
+                                                            <input id="nombre_usuario" name="nombre_usuario" type="text" class="form-control">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="manufacturername">Apellido:</label>
+                                                            <input id="apellido_usuario" name="apellido_usuario" type="text" class="form-control">
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-sm-6">
+                                                 <!--   <div class="col-sm-6">
                                                         <div class="form-group">
                                                             <label for="productdesc">Descripción</label>
-                                                            <textarea class="form-control" id="productdesc" name="descripcion" rows="5"></textarea>
+                                                            <textarea class="form-control" id="productdesc" rows="5"></textarea>
                                                         </div>
-                                                    </div>
+                                                    </div>  -->
                                                 </div>
 
                                                 <div class="row">
                                                     <div class="col-sm-6">
-                                                        <div class="form-group">
+                                                       <!-- <div class="form-group">
                                                             <label for="manufacturerbrand">Costo</label>
-                                                            <input id="manufacturerbrand" name="costo" type="text" class="form-control">
-                                                        </div>
+                                                            <input id="manufacturerbrand" name="manufacturerbrand" type="text" class="form-control">
+                                                        </div>  -->
                                                        <!-- <div class="form-group">
                                                             <label for="price">Price</label>
                                                             <input id="price" name="price" type="text" class="form-control">
                                                         </div> -->
 
                                                         <div class="form-group">
-                                                            <label class="control-label">Categoria</label>
-                                                            <select class="form-control select2" name="categoria">
+                                                            <label class="control-label">Unidad Academica:</label>
+                                                            <select class="form-control select2" name="unidad_academica">
                                                                 <option>Seleccionar</option>
-                                                                <option value="Eléctrica">Eléctrica</option>
-                                                                <option value="Manual">Manual</option>
-                                                                <option value="Neumática">Neumática</option>
-                                                                <option value="Mecánica">Mecánica</option>
+                                                                <option value="DACEA">DACEA</option>
+                                                                <option value="DAMI">DAMI</option>
+                                                                <option value="DATIC">DATIC</option>
+                                                                <option value="DATEFI">DATEFI</option>
+
                                                             </select>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label">Tipo de uso</label>
-                                                            <select class="form-control select2" name="uso">
+														<div class="form-group">
+                                                            <label class="control-label">Nivel Acceso:</label>
+                                                            <select class="form-control select2" name="Nivel_Acceso">
                                                                 <option>Seleccionar</option>
-                                                                <option value="Consumible">Consumible</option>
-                                                                <option value="Activo Fijo">Activo Fijo</option>
+                                                                <option value="0">Usuario</option>
+                                                                <option value="1">Administrador</option>
+																<option value="2">Almacen 1</option>
+																<option value="3">Almacen 2</option>
+																<option value="4">Almacen 3</option>
+                                                                
 
                                                             </select>
                                                         </div>
@@ -361,12 +367,10 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                                         </div>
                                                     </div> -->
                                                 </div>
-												<?php $la = date("d / m / Y"); ?>
-												<input type="hidden" name="fecha" value="<?php echo $la ; ?>"  >
 
                                                 <button type="submit" class="btn btn-success waves-effect waves-light">Agregar</button>
                                                 <button type="submit" class="btn btn-secondary waves-effect">Cancelar</button>
-                                                <input type="hidden" name="MM_insert" value="ingresar_producto">
+                                                <input type="hidden" name="MM_insert" value="agregar_usuario">
                                             </form>
 
                                         </div>

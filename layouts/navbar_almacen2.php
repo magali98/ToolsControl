@@ -5,7 +5,7 @@
 <div class="topbar-left">
     <div class="">
         <!--<a href="index.php" class="logo text-center">Admiria</a>-->
-        <a href="index_admin.php" class="logo"><img src="public/assets/images/logo-sm.png" height="36" alt="logo"></a>
+        <a href="index_almacen2.php" class="logo"><img src="public/assets/images/logo-sm.png" height="36" alt="logo"></a>
     </div>
 </div>
 
@@ -15,7 +15,7 @@
             <li class="menu-title">Menú Principal</li>
 
             <li>
-                <a href="index_admin.php" class="waves-effect"><i class="mdi mdi-view-dashboard"></i> <span> Dashboard <span class="badge badge-pill badge-primary pull-right">0</span></span> </a>
+                <a href="index_almacen2.php" class="waves-effect"><i class="mdi mdi-view-dashboard"></i> <span> Dashboard <span class="badge badge-pill badge-primary pull-right">0</span></span> </a>
               <!--  <ul class="list-unstyled">
                     <li><a href="index.php">Dashboard One</a></li>
                     <li><a href="dashboard-2.php">Dashboard Two</a></li>
@@ -27,10 +27,8 @@
             <li class="has_sub">
                 <a href="javascript:void(0);" class="waves-effect"><i class="mdi mdi-cube-outline"></i><span> Materiales </span></a>
                     <ul class="list-unstyled">
-                        <li><a href="consultar_productos_admin1.php">Almacen 1</a></li>
-						<li><a href="consultar_productos_admin2.php">Almacen 2</a></li>
-						<li><a href="consultar_productos_admin3.php">Almacen 3</a></li>
-                        
+                        <li><a href="consultar_productos2.php">Consultar</a></li>
+                        <li><a href="agregar_producto_almacen2.php">Agregar</a></li>
                        <!-- <li><a href="index.php">Modificar</a></li>
                         <li><a href="index.php">Eliminar</a></li> -->
                     </ul>
@@ -45,9 +43,9 @@
                 </ul>
             </li>   -->
 
-          <!--  <li>
-                <a href="solicitud_admin.php" class="waves-effect"><i class="mdi mdi-calendar-check"></i><span> Solicitudes </span></a>
-            </li> -->
+            <li>
+                <a href="solicitud_admin2.php" class="waves-effect"><i class="mdi mdi-calendar-check"></i><span> Solicitudes </span></a>
+            </li>
 
 <!--            <li class="menu-title">Components</li>
 
@@ -144,7 +142,7 @@
                 </ul>
             </li>
 -->
-            <li class="menu-title">Usuarios</li>
+           <!-- <li class="menu-title">Usuarios</li>
 
             <li class="has_sub">
                 <a href="javascript:void(0);" class="waves-effect"><i class="mdi mdi-account-location"></i><span> Usuarios <span class="pull-right"><i class="mdi mdi-chevron-right"></i></span> </span></a>
@@ -152,12 +150,12 @@
                     <li><a href="agregar_usuario.php">Agregar</a></li>
                     <li><a href="consultar_usuario.php">Buscar</a></li>
     
-            <!--        <li><a href="pages-login-2.php">Login 2</a></li>
+                   <li><a href="pages-login-2.php">Login 2</a></li>
                     <li><a href="pages-register-2.php">Register 2</a></li>
                     <li><a href="pages-recoverpw-2.php">Recover Password 2</a></li>
-                    <li><a href="pages-lock-screen-2.php">Lock Screen 2</a></li>  -->
+                    <li><a href="pages-lock-screen-2.php">Lock Screen 2</a></li>  
                 </ul>
-            </li>
+            </li> -->
 <!--
             <li class="has_sub">
                 <a href="javascript:void(0);" class="waves-effect"><i class="mdi mdi-google-pages"></i><span> Extra Pages <span class="pull-right"><i class="mdi mdi-chevron-right"></i></span> </span></a>

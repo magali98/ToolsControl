@@ -31,7 +31,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "2";
+$MM_authorizedUsers = "4";
 $MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
@@ -110,7 +110,7 @@ if (isset($_SERVER['QUERY_STRING'])) {
 }
 
 if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")) {
-  $insertSQL = sprintf("INSERT INTO Productos_almacen1 (id, producto, cantidad, descripcion, costo, categoria, uso, fecha_alta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+  $insertSQL = sprintf("INSERT INTO Productos_almacen3 (id, producto, cantidad, descripcion, costo, categoria, uso, fecha_alta) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
                        GetSQLValueString($_POST['id_producto'], "text"),
                        GetSQLValueString($_POST['nombre_producto'], "text"),
                        GetSQLValueString($_POST['cantidad_producto'], "int"),
@@ -118,12 +118,12 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                        GetSQLValueString($_POST['costo'], "text"),
                        GetSQLValueString($_POST['categoria'], "text"),
                        GetSQLValueString($_POST['uso'], "text"),
-                       GetSQLValueString($_POST['fecha'], "date"));
+                       GetSQLValueString($_POST['fecha'], "text"));
 
   mysql_select_db($database_conexion, $conexion);
   $Result1 = mysql_query($insertSQL, $conexion) or die(mysql_error());
 
-  $insertGoTo = "agregar_producto_exito.php";
+  $insertGoTo = "agregar_producto_exito_almacen3.php";
   if (isset($_SERVER['QUERY_STRING'])) {
     $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
     $insertGoTo .= $_SERVER['QUERY_STRING'];
@@ -145,7 +145,7 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
         <!-- Begin page -->
         <div id="wrapper">
 
-        <?php include 'layouts/navbar_almacen1.php'; ?>
+        <?php include 'layouts/navbar_almacen3.php'; ?>
 
             <!-- Start right Content here -->
             <div class="content-page">
@@ -279,8 +279,8 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                     <div class="card m-b-20">
                                         <div class="card-body">
 
-                                            <h4 class="mt-0 header-title">Información</h4>
-                                            <p class="text-muted m-b-30 font-14">Completar todos los campos listados a continuación: </p>
+                                            <h4 class="mt-0 header-title">¡Operación Exitosa!</h4>
+                                            <p class="text-muted m-b-30 font-14">Completar todos los campos listados a continuación:</p>
 
                                             <form method="POST" action="<?php echo $editFormAction; ?>" name="ingresar_producto">
                                                 <div class="row">
@@ -332,8 +332,9 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                                             <label class="control-label">Tipo de uso</label>
                                                             <select class="form-control select2" name="uso">
                                                                 <option>Seleccionar</option>
-                                                                <option value="Consumible">Consumible</option>
+                                                               <option value="Consumible">Consumible</option>
                                                                 <option value="Activo Fijo">Activo Fijo</option>
+
 
                                                             </select>
                                                         </div>
@@ -361,9 +362,10 @@ if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "ingresar_producto")
                                                         </div>
                                                     </div> -->
                                                 </div>
+
 												<?php $la = date("d / m / Y"); ?>
 												<input type="hidden" name="fecha" value="<?php echo $la ; ?>"  >
-
+												
                                                 <button type="submit" class="btn btn-success waves-effect waves-light">Agregar</button>
                                                 <button type="submit" class="btn btn-secondary waves-effect">Cancelar</button>
                                                 <input type="hidden" name="MM_insert" value="ingresar_producto">

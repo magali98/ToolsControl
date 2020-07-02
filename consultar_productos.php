@@ -1,3 +1,115 @@
+<?php require_once('Connections/conexion.php'); ?>
+<?php
+//initialize the session
+if (!isset($_SESSION)) {
+  session_start();
+}
+
+// ** Logout the current user. **
+$logoutAction = $_SERVER['PHP_SELF']."?doLogout=true";
+if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
+  $logoutAction .="&". htmlentities($_SERVER['QUERY_STRING']);
+}
+
+if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
+  //to fully log out a visitor we need to clear the session varialbles
+  $_SESSION['MM_Username'] = NULL;
+  $_SESSION['MM_UserGroup'] = NULL;
+  $_SESSION['PrevUrl'] = NULL;
+  unset($_SESSION['MM_Username']);
+  unset($_SESSION['MM_UserGroup']);
+  unset($_SESSION['PrevUrl']);
+	
+  $logoutGoTo = "index.php";
+  if ($logoutGoTo) {
+    header("Location: $logoutGoTo");
+    exit;
+  }
+}
+?>
+<?php
+if (!isset($_SESSION)) {
+  session_start();
+}
+$MM_authorizedUsers = "1,2";
+$MM_donotCheckaccess = "false";
+
+// *** Restrict Access To Page: Grant or deny access to this page
+function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) { 
+  // For security, start by assuming the visitor is NOT authorized. 
+  $isValid = False; 
+
+  // When a visitor has logged into this site, the Session variable MM_Username set equal to their username. 
+  // Therefore, we know that a user is NOT logged in if that Session variable is blank. 
+  if (!empty($UserName)) { 
+    // Besides being logged in, you may restrict access to only certain users based on an ID established when they login. 
+    // Parse the strings into arrays. 
+    $arrUsers = Explode(",", $strUsers); 
+    $arrGroups = Explode(",", $strGroups); 
+    if (in_array($UserName, $arrUsers)) { 
+      $isValid = true; 
+    } 
+    // Or, you may restrict access to only certain users based on their username. 
+    if (in_array($UserGroup, $arrGroups)) { 
+      $isValid = true; 
+    } 
+    if (($strUsers == "") && false) { 
+      $isValid = true; 
+    } 
+  } 
+  return $isValid; 
+}
+
+$MM_restrictGoTo = "index_admin.php";
+if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
+  $MM_qsChar = "?";
+  $MM_referrer = $_SERVER['PHP_SELF'];
+  if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
+  if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING']) > 0) 
+  $MM_referrer .= "?" . $_SERVER['QUERY_STRING'];
+  $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
+  header("Location: ". $MM_restrictGoTo); 
+  exit;
+}
+?>
+<?php
+if (!function_exists("GetSQLValueString")) {
+function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+{
+  if (PHP_VERSION < 6) {
+    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
+  }
+
+  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+
+  switch ($theType) {
+    case "text":
+      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+      break;    
+    case "long":
+    case "int":
+      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
+      break;
+    case "double":
+      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
+      break;
+    case "date":
+      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+      break;
+    case "defined":
+      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
+      break;
+  }
+  return $theValue;
+}
+}
+
+mysql_select_db($database_conexion, $conexion);
+$query_consulta = "SELECT * FROM Productos_almacen1";
+$consulta = mysql_query($query_consulta, $conexion) or die(mysql_error());
+$row_consulta = mysql_fetch_assoc($consulta);
+$totalRows_consulta = mysql_num_rows($consulta);
+?>
 <?php include 'layouts/header.php'; ?>
 
         <!-- DataTables -->
@@ -14,7 +126,7 @@
         <!-- Begin page -->
         <div id="wrapper">
 
-        <?php include 'layouts/navbar.php'; ?>
+        <?php include 'layouts/navbar_almacen1.php'; ?>
 
             <!-- Start right Content here -->
             <div class="content-page">
@@ -112,7 +224,7 @@
                                         <a class="dropdown-item" href="#"><span class="badge badge-success pull-right m-t-5"></span><i class="dripicons-gear text-muted"></i> Configurar</a>
                                       <!--  <a class="dropdown-item" href="#"><i class="dripicons-lock text-muted"></i> Lock screen</a> -->
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#"><i class="dripicons-exit text-muted"></i> Salir</a>
+                                        <a class="dropdown-item" href="<?php echo $logoutAction ?>"><i class="dripicons-exit text-muted"></i> Salir</a>
                                     </div>
                                 </li>
                             </ul>
@@ -142,294 +254,39 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
-                                            <table id="datatable" class="table table-striped dt-responsive nowrap table-vertical" width="100%" cellspacing="0">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Id</th>
-                                                        <th>Nombre</th>
-                                                        <th>Cantidad</th>
-                                                        <th>Descripción</th>
-                                                        <th>Costo</th>
-                                                        <th>Fecha de alta</th>
-                                                        <th>Acción</th>
-                                                    </tr>
+                                          
+                                          <table id="datatable" class="table table-striped dt-responsive nowrap table-vertical" width="100%" cellspacing="0">
+                                              <thead>
+                                                <tr>
+                                                  <th>Id</th>
+                                                  <th>Nombre</th>
+                                                  <th>Cantidad</th>
+                                                  <th>Descripción</th>
+                                                  <th>Costo</th>
+                                                  <th>Fecha de alta</th>
+                                                  <th>Acción</th>
+                                                  </tr>
                                                 </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>UT0001</td>
-                                                        <td>Martillo cabeza de metal</td>
-                                                        <td>5</td>
-                                                        <td>Martillo mango de plastico y cabeza metalica</td>
-                                                        <td>$250</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0002</td>
-                                                        <td>Electrodos 220</td>
-                                                        <td>25</td>
-                                                        <td>
-                                                            Electrodo 220 para soldar</td>
-                                                        <td>$25</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0003</td>
-                                                        <td>Flexometro Amarillo</td>
-                                                        <td>4</td>
-                                                        <td>Flexometro amarillo 3.5 metros</td>
-                                                        <td>$180</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0004</td>
-                                                        <td>Caretas de seguridad</td>
-                                                        <td>18</td>
-                                                        <td>Careta de seguridad Poliestireno</td>
-                                                        <td>$400</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0005</td>
-                                                        <td>Desarmador cruz</td>
-                                                        <td>15</td>
-                                                        <td>Desarmador Cruz Plastico</td>
-                                                        <td>$41</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0006</td>
-                                                        <td>Desarmador plano</td>
-                                                        <td>6</td>
-                                                        <td>Desarmador plano plastico</td>
-                                                        <td>$41</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0007</td>
-                                                        <td>Desarmador estrella</td>
-                                                        <td>11</td>
-                                                        <td>Desarmador estrella plastico</td>
-                                                        <td>$50</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0008</td>
-                                                        <td>Aire comprimido</td>
-                                                        <td>5</td>
-                                                        <td>Lata aire comprimido</td>
-                                                        <td>$110</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0009</td>
-                                                        <td>Llave 1/5</td>
-                                                        <td>7</td>
-                                                        <td>Llave metalica</td>
-                                                        <td>$58</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0010</td>
-                                                        <td>Llave 2/3</td>
-                                                        <td>5</td>
-                                                        <td>Llave metalica</td>
-                                                        <td>$41</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0011</td>
-                                                        <td>Soplete</td>
-                                                        <td>4</td>
-                                                        <td>Sopletes metalicos</td>
-                                                        <td>$175</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0012</td>
-                                                        <td>Bateria 50,000 M</td>
-                                                        <td>6</td>
-                                                        <td>Bateria</td>
-                                                        <td>$456</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0013</td>
-                                                        <td>Tuvo de ensayo</td>
-                                                        <td>11</td>
-                                                        <td>Tuvo de ensayo cristal</td>
-                                                        <td>$47</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0014</td>
-                                                        <td>Cargadores</td>
-                                                        <td>5</td>
-                                                        <td>Cargadores varios</td>
-                                                        <td>$56</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0015</td>
-                                                        <td>Tripie</td>
-                                                        <td>4</td>
-                                                        <td>Tripie plastico y metal</td>
-                                                        <td>$121</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0016</td>
-                                                        <td>Programas</td>
-                                                        <td>12</td>
-                                                        <td>Programas varios</td>
-                                                        <td>$841</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0017</td>
-                                                        <td>Gas</td>
-                                                        <td>2</td>
-                                                        <td>Latas de gas</td>
-                                                        <td>$51</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0018</td>
-                                                        <td>Latas</td>
-                                                        <td>10</td>
-                                                        <td>Latas varias</td>
-                                                        <td>$123</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0019</td>
-                                                        <td>Conectores</td>
-                                                        <td>12</td>
-                                                        <td>Conectores Varios</td>
-                                                        <td>$94</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0020</td>
-                                                        <td>Boligrafos</td>
-                                                        <td>9</td>
-                                                        <td>Boligrafos varios</td>
-                                                        <td>$22</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>UT0021</td>
-                                                        <td>Extensión</td>
-                                                        <td>5</td>
-                                                        <td>Extensiones varias 2m.</td>
-                                                        <td>$49</td>
-                                                        <td>29/05/2020</td>
-                                                        <td>
-                                                            <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                            <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
+                                              <tbody>
+												  <?php do { ?>
+                                                <tr>
+                                                  <td><?php echo $row_consulta['id']; ?></td>
+                                                  <td><?php echo $row_consulta['producto']; ?></td>
+                                                  <td><?php echo $row_consulta['cantidad']; ?></td>
+                                                  <td><?php echo $row_consulta['descripcion']; ?> </td>
+                                                  <td>$<?php echo $row_consulta['costo']; ?>  </td>
+                                                  <td><?php echo $row_consulta['fecha_alta']; ?></td>
+                                                  <td>
+                                                    <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
+                                                    <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
+                                                    </td>
+                                                  </tr>
+                                                <?php } while ($row_consulta = mysql_fetch_assoc($consulta)); ?>
+                                                
+                                              </tbody>
                                             </table>
+                                            
+                                            
 
                                         </div>
                                     </div>
@@ -470,3 +327,6 @@
 
     </body>
 </html>
+<?php
+mysql_free_result($consulta);
+?>

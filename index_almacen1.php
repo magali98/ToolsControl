@@ -31,7 +31,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "1";
+$MM_authorizedUsers = "2";
 $MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
@@ -60,7 +60,7 @@ function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) {
   return $isValid; 
 }
 
-$MM_restrictGoTo = "index_almacen1.php";
+$MM_restrictGoTo = "index_almacen2.php";
 if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
   $MM_qsChar = "?";
   $MM_referrer = $_SERVER['PHP_SELF'];
@@ -139,7 +139,7 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
         <!-- Begin page -->
         <div id="wrapper">
 
-        <?php include 'layouts/navbar.php'; ?>
+        <?php include 'layouts/navbar_almacen1.php'; ?>
 
             <!-- Start right Content here -->
             <div class="content-page">

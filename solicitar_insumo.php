@@ -1,3 +1,101 @@
+<?php require_once('Connections/conexion.php'); ?>
+<?php
+if (!isset($_SESSION)) {
+  session_start();
+}
+$MM_authorizedUsers = "0";
+$MM_donotCheckaccess = "false";
+
+// *** Restrict Access To Page: Grant or deny access to this page
+function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) { 
+  // For security, start by assuming the visitor is NOT authorized. 
+  $isValid = False; 
+
+  // When a visitor has logged into this site, the Session variable MM_Username set equal to their username. 
+  // Therefore, we know that a user is NOT logged in if that Session variable is blank. 
+  if (!empty($UserName)) { 
+    // Besides being logged in, you may restrict access to only certain users based on an ID established when they login. 
+    // Parse the strings into arrays. 
+    $arrUsers = Explode(",", $strUsers); 
+    $arrGroups = Explode(",", $strGroups); 
+    if (in_array($UserName, $arrUsers)) { 
+      $isValid = true; 
+    } 
+    // Or, you may restrict access to only certain users based on their username. 
+    if (in_array($UserGroup, $arrGroups)) { 
+      $isValid = true; 
+    } 
+    if (($strUsers == "") && false) { 
+      $isValid = true; 
+    } 
+  } 
+  return $isValid; 
+}
+
+$MM_restrictGoTo = "index.php";
+if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
+  $MM_qsChar = "?";
+  $MM_referrer = $_SERVER['PHP_SELF'];
+  if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
+  if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING']) > 0) 
+  $MM_referrer .= "?" . $_SERVER['QUERY_STRING'];
+  $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
+  header("Location: ". $MM_restrictGoTo); 
+  exit;
+}
+?>
+<?php
+if (!function_exists("GetSQLValueString")) {
+function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+{
+  if (PHP_VERSION < 6) {
+    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
+  }
+
+  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+
+  switch ($theType) {
+    case "text":
+      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+      break;    
+    case "long":
+    case "int":
+      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
+      break;
+    case "double":
+      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
+      break;
+    case "date":
+      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+      break;
+    case "defined":
+      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
+      break;
+  }
+  return $theValue;
+}
+}
+
+mysql_select_db($database_conexion, $conexion);
+$query_almacen1listado = "SELECT * FROM Productos_almacen1";
+$almacen1listado = mysql_query($query_almacen1listado, $conexion) or die(mysql_error());
+$row_almacen1listado = mysql_fetch_assoc($almacen1listado);
+$totalRows_almacen1listado = mysql_num_rows($almacen1listado);
+
+$colname_usuario1 = "-1";
+if (isset($_SESSION['MM_Username'])) {
+  $colname_usuario1 = $_SESSION['MM_Username'];
+}
+mysql_select_db($database_conexion, $conexion);
+$query_usuario1 = sprintf("SELECT nombre, apellido FROM Usuarios WHERE email = %s", GetSQLValueString($colname_usuario1, "text"));
+$usuario1 = mysql_query($query_usuario1, $conexion) or die(mysql_error());
+$row_usuario1 = mysql_fetch_assoc($usuario1);
+$totalRows_usuario1 = mysql_num_rows($usuario1);
+$query_Listado_almacen1 = "SELECT * FROM Productos_almacen1";
+$Listado_almacen1 = mysql_query($query_Listado_almacen1, $conexion) or die(mysql_error());
+$row_Listado_almacen1 = mysql_fetch_assoc($Listado_almacen1);
+$totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
+?>
 <?php include 'layouts/header.php'; ?>
 
     <!-- Select 2 -->
@@ -147,107 +245,33 @@
                                         <div class="card-body">
 
                                             <h4 class="mt-0 header-title">Información</h4>
-                                            <p class="text-muted m-b-30 font-14">Completar todos los campos listados a continuación:</p>
+                                            <p class="text-muted m-b-30 font-14">Selecciona las opciones a continuación: </p>
 
                                             <form>
                                                 <div class="row">
                                                     <div class="col-sm-6">
+                                                        <?php do { ?>
                                                         <div class="form-group">
-                                                            <label for="productname">Nombre del producto</label>
-                                                            <input id="productname" name="productname" type="text" class="form-control">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="manufacturername">Cantidad</label>
-                                                            <input id="manufacturername" name="manufacturername" type="text" class="form-control">
-                                                        </div>
+															<input type="checkbox" value="<?php echo $row_almacen1listado['producto']; ?>">
+                                                            <label for="productname"><?php echo $row_almacen1listado['producto']; ?></label>
+                                                            
+                                                          </div>
+                                                          <?php } while ($row_almacen1listado = mysql_fetch_assoc($almacen1listado)); ?>
+                                                       	  <div class="form-group">
+                                                            <label for="metatitle">PickUp</label>
+                                                            <input id="pickup" name="pickup" type="datetime-local" class="form-control">
+                                                       	  </div>
                                                     </div>
 
-                                                    <div class="col-sm-6">
-                                                        <div class="card-body>"
-                                                          <div class="row">
-                                                              <div class="col-12">
-                                                                  <div class="card">
-                                                                      <div class="card-body">
-                                                                          <table id="datatable" class="table table-striped dt-responsive nowrap table-vertical" width="100%" cellspacing="0">
-                                                                              <thead>
-                                                                                  <tr>
-
-                                                                                      <th>Nombre</th>
-                                                                                      <th>Cantidad</th>
-
-                                                                                  </tr>
-                                                                              </thead>
-                                                                              <tbody>
-                                                                                  <tr>
-
-                                                                                      <td>Martillo cabeza de metal</td>
-                                                                                      <td>5</td>
-
-                                                                                  </tr>
-                                                                              </tbody>
-                                                                            </table>
-                                                                          </div>
-                                                                        </div>
-                                                                      </div>
-                                                                    </div>
-                                                        </div>
+                                                    <input type="hidden" name="nombre" value="<?php echo $row_usuario1['nombre']; ?>">
+													<input type="hidden" name="apellido" value="<?php echo $row_usuario1['apellido']; ?>">
+													<?php $lafechadesolicitud = date("d / m / Y"); ?>
+													<input type="hidden" name="fecha_solicitud" value="<?php echo $lafechadesolicitud ; ?>"  >
                                                     </div>
+												
                                                 </div>
-
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="manufacturerbrand">Costo</label>
-                                                            <input id="manufacturerbrand" name="manufacturerbrand" type="text" class="form-control">
-                                                        </div>
-                                                       <!-- <div class="form-group">
-                                                            <label for="price">Price</label>
-                                                            <input id="price" name="price" type="text" class="form-control">
-                                                        </div> -->
-
-                                                        <div class="form-group">
-                                                            <label class="control-label">Categoria</label>
-                                                            <select class="form-control select2">
-                                                                <option>Seleccionar</option>
-                                                                <option value="AK">Eléctrica</option>
-                                                                <option value="HI">Manual</option>
-                                                                <option value="AK">Neumática</option>
-                                                                <option value="AK">Mecánica</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label class="control-label">Tipo de uso</label>
-                                                            <select class="form-control select2">
-                                                                <option>Seleccionar</option>
-                                                                <option value="AK">Consumible</option>
-                                                                <option value="HI">Activo Fijo</option>
-
-                                                            </select>
-                                                        </div>
-                                                       <!-- <div class="form-group">
-                                                            <label class="control-label">Features</label>
-
-                                                            <select class="select2 form-control select2-multiple" multiple="multiple" data-placeholder="Choose ...">
-                                                                <option value="AK">Alaska</option>
-                                                                <option value="HI">Hawaii</option>
-                                                                <option value="CA">California</option>
-                                                                <option value="NV">Nevada</option>
-                                                                <option value="OR">Oregon</option>
-                                                                <option value="WA">Washington</option>
-                                                            </select>
-
-                                                        </div> -->
-                                                    </div>
-
-                                                   <!-- <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label>Product Image</label> <br/>
-                                                            <img src="public/assets/images/products/1.jpg" alt="product img" class="img-fluid" style="max-width: 200px;" />
-                                                            <br/>
-                                                            <button type="button" class="btn btn-purple m-t-10 waves-effect waves-light">Change Image</button>
-                                                        </div>
-                                                    </div> -->
-                                                </div>
+                                       
+                                     </div>  
 
                                                 <button type="submit" class="btn btn-success waves-effect waves-light">Agregar</button>
                                                 <button type="submit" class="btn btn-secondary waves-effect">Cancelar</button>
@@ -322,3 +346,10 @@
 
     </body>
 </html>
+<?php
+mysql_free_result($almacen1listado);
+
+mysql_free_result($usuario1);
+
+mysql_free_result($Listado_almacen1);
+?>
