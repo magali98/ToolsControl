@@ -76,6 +76,30 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
+$editFormAction = $_SERVER['PHP_SELF'];
+if (isset($_SERVER['QUERY_STRING'])) {
+  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+}
+
+if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form")) {
+  $insertSQL = sprintf("INSERT INTO Solicitud (nombre, apellido, fecha_solicitud, pickup, productos) VALUES (%s, %s, %s, %s, %s)",
+                       GetSQLValueString($_POST['nombre'], "text"),
+                       GetSQLValueString($_POST['apellido'], "text"),
+                       GetSQLValueString($_POST['fecha_solicitud'], "text"),
+                       GetSQLValueString($_POST['pickup'], "text"),
+                       GetSQLValueString($_POST['mostrar_region'], "text"));
+
+  mysql_select_db($database_conexion, $conexion);
+  $Result1 = mysql_query($insertSQL, $conexion) or die(mysql_error());
+
+  $insertGoTo = "solicitar_insumo.php";
+  if (isset($_SERVER['QUERY_STRING'])) {
+    $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
+    $insertGoTo .= $_SERVER['QUERY_STRING'];
+  }
+  header(sprintf("Location: %s", $insertGoTo));
+}
+
 mysql_select_db($database_conexion, $conexion);
 $query_almacen1listado = "SELECT * FROM Productos_almacen1";
 $almacen1listado = mysql_query($query_almacen1listado, $conexion) or die(mysql_error());
@@ -247,15 +271,22 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                                             <h4 class="mt-0 header-title">Información</h4>
                                             <p class="text-muted m-b-30 font-14">Selecciona las opciones a continuación: </p>
 
-                                            <form>
+                                  <form method="POST" action="<?php echo $editFormAction; ?>" name="form">
                                                 <div class="row">
                                                     <div class="col-sm-6">
                                                         <?php do { ?>
                                                         <div class="form-group">
-															<input type="checkbox" value="<?php echo $row_almacen1listado['producto']; ?>">
-                                                            <label for="productname"><?php echo $row_almacen1listado['producto']; ?></label>
-                                                            
-                                                          </div>
+															<table width="200">
+															  <tr>
+															    <td><label>
+															      <input type="checkbox" name="mostrar_region" value="<?php echo $row_almacen1listado['producto']; ?>" id="mostrar_region_0">
+															      <?php echo $row_almacen1listado['producto']; ?></label></td>
+														    </tr>
+														  </table>
+															
+															
+															
+                                                         </div>
                                                           <?php } while ($row_almacen1listado = mysql_fetch_assoc($almacen1listado)); ?>
                                                        	  <div class="form-group">
                                                             <label for="metatitle">PickUp</label>
@@ -275,7 +306,8 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
 
                                                 <button type="submit" class="btn btn-success waves-effect waves-light">Agregar</button>
                                                 <button type="submit" class="btn btn-secondary waves-effect">Cancelar</button>
-                                            </form>
+                                                <input type="hidden" name="MM_insert" value="form">
+                                    </form>
 
                                         </div>
                                     </div>
