@@ -125,6 +125,12 @@ $query_contar_usuarios = "SELECT * FROM Usuarios";
 $contar_usuarios = mysql_query($query_contar_usuarios, $conexion) or die(mysql_error());
 $row_contar_usuarios = mysql_fetch_assoc($contar_usuarios);
 $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
+
+mysql_select_db($database_conexion, $conexion);
+$query_consultar_notificaciones = "SELECT * FROM Solicitud";
+$consultar_notificaciones = mysql_query($query_consultar_notificaciones, $conexion) or die(mysql_error());
+$row_consultar_notificaciones = mysql_fetch_assoc($consultar_notificaciones);
+$totalRows_consultar_notificaciones = mysql_num_rows($consultar_notificaciones);
 ?>
 <?php include 'layouts/header.php'; ?>
     <!-- C3 charts css -->
@@ -192,27 +198,22 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
                                     <a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#" role="button"
                                        aria-haspopup="false" aria-expanded="false">
                                         <i class="ion-ios7-bell noti-icon"></i>
-                                        <span class="badge badge-danger noti-icon-badge">2</span>
+                                        <span class="badge badge-danger noti-icon-badge"><?php echo $totalRows_consultar_notificaciones ?></span>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-arrow dropdown-menu-lg">
                                         <!-- item-->
                                         <div class="dropdown-item noti-title">
-                                            <h5>Notificaciones (2)</h5>
+                                            <h5>Notificaciones (<?php echo $totalRows_consultar_notificaciones ?>)</h5>
                                         </div>
-
-                                        <!-- item-->
-                                        <a href="javascript:void(0);" class="dropdown-item notify-item active">
+                                        <?php do { ?>
+                                          
+                                          <!-- item-->
+                                          <a href="javascript:void(0);" class="dropdown-item notify-item active">
                                             <div class="notify-icon bg-success"><i class="ion-ios7-bell noti-icon"></i></div>
                                             <p class="notify-details"><b>Solicitud de material</b><small class="text-muted">Entrega de material pendiente.</small></p>
-                                        </a>
-
-                                        <!-- item-->
-                                        <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                            <div class="notify-icon bg-warning"><i class="ion-ios7-bell noti-icon"></i></div>
-                                            <p class="notify-details"><b>Solicitud de material</b><small class="text-muted">Entrega de material pendiente.</small></p>
-                                        </a>
-
-                                        <!-- item
+                                          </a>
+                                          <?php } while ($row_consultar_notificaciones = mysql_fetch_assoc($consultar_notificaciones)); ?>
+<!-- item
                                         <a href="javascript:void(0);" class="dropdown-item notify-item">
                                             <div class="notify-icon bg-info"><i class="mdi mdi-martini"></i></div>
                                             <p class="notify-details"><b>Your item is shipped</b><small class="text-muted">It is a long established fact that a reader will</small></p>
@@ -284,11 +285,11 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
                                     <div class="mini-stat clearfix bg-white">
                                         <span class="mini-stat-icon bg-blue-grey mr-0 float-right"><i class="mdi mdi-black-mesa"></i></span>
                                         <div class="mini-stat-info">
-                                            <span class="counter text-blue-grey">4</span>
+                                            <span class="counter text-blue-grey"><?php echo $totalRows_consultar_notificaciones ?></span>
                                             Solicitudes Pendientes
                                         </div>
                                         <div class="clearfix"></div>
-                                        <p class="text-muted mb-0 m-t-20">Total de solicitudes: 17 <span class="pull-right"></p>
+                                        <p class="text-muted mb-0 m-t-20">Total de solicitudes: <?php echo $totalRows_consultar_notificaciones ?> <span class="pull-right"></p>
                                     </div>
                                 </div>
                                 <div class="col-md-6 col-xl-3">
@@ -306,7 +307,7 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
                                     <div class="mini-stat clearfix bg-white">
                                         <span class="mini-stat-icon bg-teal mr-0 float-right"><i class="mdi mdi-coffee"></i></span>
                                         <div class="mini-stat-info">
-                                            <span class="counter text-teal">288 Hrs.</span>
+                                            <span class="counter text-teal">388 Hrs.</span>
                                             Uso continuo
                                         </div>
                                         <div class="clearfix"></div>
@@ -616,6 +617,8 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
                                         </div>
                                     </div>
                                 </div>
+								
+								 <img src="images/Dashboard.png" width="700px">	
 <!--
                                 <div class="col-xl-6">
                                     <div class="card m-b-20">
@@ -767,4 +770,6 @@ mysql_free_result($Usuario);
 mysql_free_result($almacen1);
 
 mysql_free_result($contar_usuarios);
+
+mysql_free_result($consultar_notificaciones);
 ?>
