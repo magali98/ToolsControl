@@ -44,7 +44,7 @@
                                     </a>
                                 </li>
                                 <!-- language-->
-                                <li class="list-inline-item dropdown notification-list hidden-xs-down">
+                               <!-- <li class="list-inline-item dropdown notification-list hidden-xs-down">
                                     <a class="nav-link dropdown-toggle arrow-none waves-effect text-muted" data-toggle="dropdown" href="#" role="button"
                                        aria-haspopup="false" aria-expanded="false">
                                         English <img src="public/assets/images/flags/us_flag.jpg" class="ml-2" height="16" alt=""/>
@@ -56,7 +56,7 @@
                                         <a class="dropdown-item" href="#"><img src="public/assets/images/flags/spain_flag.jpg" alt="" height="16"/><span> Spanish </span></a>
                                         <a class="dropdown-item" href="#"><img src="public/assets/images/flags/russia_flag.jpg" alt="" height="16"/><span> Russian </span></a>
                                     </div>
-                                </li>
+                                </li> -->
                                 <!-- notification-->
                                 <li class="list-inline-item dropdown notification-list">
                                     <a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#" role="button"
@@ -103,12 +103,12 @@
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
                                         <a class="dropdown-item" href="#"><i class="dripicons-user text-muted"></i> Profile</a>
-                                        <a class="dropdown-item" href="#"><i class="dripicons-wallet text-muted"></i> My Wallet</a>
+                                       <!-- <a class="dropdown-item" href="#"><i class="dripicons-wallet text-muted"></i> My Wallet</a>
                                         <a class="dropdown-item" href="#"><span class="badge badge-success pull-right m-t-5">5</span><i class="dripicons-gear text-muted"></i> Settings</a>
                                         <a class="dropdown-item" href="#"><i class="dripicons-lock text-muted"></i> Lock screen</a>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#"><i class="dripicons-exit text-muted"></i> Logout</a>
-                                    </div>
+                                    </div> -->
                                 </li>
                             </ul>
 
