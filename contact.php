@@ -165,16 +165,17 @@
                                                         <h6 class="font-14">Email</h6>
                                                         <p class="text-muted">Variable email</p>
                                                     </div>
+                                                    
+                                                </div>
+                                                <div class="col-md-8">
+													<div class="pt-3">
+                                                        <h6 class="font-14">Email</h6>
+                                                        <p class="text-muted">Variable email</p>
+                                                    </div>
                                                     <div class="pt-3">
                                                         <h6 class="font-14">Email</h6>
                                                         <p class="text-muted">Variable email</p>
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <h6 class="font-14">Email</h6>
-                                                        <p class="text-muted">Variable email</p>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-8">
                                                   <!--  <form class="form-custom">
                                                         <div class="row">
                                                             <div class="col-md-6">
