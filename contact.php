@@ -169,7 +169,7 @@
                                                         <h6 class="font-14">Email</h6>
                                                         <p class="text-muted">Variable email</p>
                                                     </div>
-                                                    <div class="pt-3">
+                                                    <div class="row">
                                                         <h6 class="font-14">Email</h6>
                                                         <p class="text-muted">Variable email</p>
                                                     </div>
