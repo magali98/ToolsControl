@@ -162,8 +162,8 @@
                                                         <p class="text-muted">Variable apellido</p>
                                                     </div>
                                                     <div class="pt-3">
-                                                        <h6 class="font-14">Email</h6>
-                                                        <p class="text-muted">Variable email</p>
+                                                        <h6 class="font-14">Unidad Académica</h6>
+                                                        <p class="text-muted">Variable unidad académica</p>
                                                     </div>
                                                     
                                                 </div>
@@ -173,8 +173,8 @@
                                                         <p class="text-muted">Variable email</p>
                                                     </div>
                                                     <div class="pt-3">
-                                                        <h6 class="font-14">Email</h6>
-                                                        <p class="text-muted">Variable email</p>
+                                                        <h6 class="font-14">Password</h6>
+                                                        <p class="text-muted">Variable Password</p>
                                                     </div>
                                                   <!--  <form class="form-custom">
                                                         <div class="row">
