@@ -145,8 +145,8 @@
                                             <div class="row">
                                                 <div class="col-12">
                                                     <div class="text-center">
-                                                        <h5>Datos personales ?</h5>
-                                                        <p class="text-muted">It is a long established fact that a reader will be of a page when looking at its layout.</p>
+                                                        <h5>Datos personales </h5>
+                                                        <p class="text-muted">Conociendote te conocemos</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -167,7 +167,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-8">
-                                                    <form class="form-custom">
+                                                  <!--  <form class="form-custom">
                                                         <div class="row">
                                                             <div class="col-md-6">
                                                                 <div class="form-group">
@@ -178,7 +178,7 @@
                                                             <div class="col-md-6">
                                                                 <div class="form-group">
                                                                     <label class="sr-only" for="useremail">Email address</label>
-                                                                    <input type="email" class="form-control" id="useremail" placeholder="Your Email" required="">
+                                                                   <input type="email" class="form-control" id="useremail" placeholder="Your Email" required="">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -202,7 +202,7 @@
                                                                 <button type="button" class="btn btn-primary waves-effect waves-light">Send Message</button>
                                                             </div>
                                                         </div>
-                                                    </form>
+                                                    </form> -->
                                                 </div>
                                             </div>
                                         </div>
