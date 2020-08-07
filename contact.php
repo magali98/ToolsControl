@@ -120,7 +120,7 @@
                                     </button>
                                 </li>
                                 <li class="hide-phone list-inline-item app-search">
-                                    <h3 class="page-title">Contact</h3>
+                                    <h3 class="page-title">Perfil</h3>
                                 </li>
                             </ul>
 
@@ -145,7 +145,7 @@
                                             <div class="row">
                                                 <div class="col-12">
                                                     <div class="text-center">
-                                                        <h5>Have any questions?</h5>
+                                                        <h5>Datos personales ?</h5>
                                                         <p class="text-muted">It is a long established fact that a reader will be of a page when looking at its layout.</p>
                                                     </div>
                                                 </div>
@@ -154,16 +154,16 @@
                                             <div class="row m-t-40">
                                                 <div class="col-md-4">
                                                     <div>
-                                                        <h6 class="font-14">Email Address</h6>
-                                                        <p class="text-muted">supportemail@admiria  .com</p>
+                                                        <h6 class="font-14">Nombre</h6>
+                                                        <p class="text-muted">Variable nombre</p>
                                                     </div>
                                                     <div class="pt-3">
-                                                        <h6 class="font-14">Telephone number</h6>
-                                                        <p class="text-muted">+123 45 56 879</p>
+                                                        <h6 class="font-14">Apellido</h6>
+                                                        <p class="text-muted">Variable apellido</p>
                                                     </div>
                                                     <div class="pt-3">
-                                                        <h6 class="font-14">Address</h6>
-                                                        <p class="text-muted">09 Design Street, Downtown Victoria, Australia</p>
+                                                        <h6 class="font-14">Email</h6>
+                                                        <p class="text-muted">Variable email</p>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-8">
