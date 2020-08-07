@@ -234,7 +234,7 @@ $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
                                     <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
                                         <a class="dropdown-item" href="#"><i class="dripicons-user text-muted"></i> Perfil</a>
                                       <!--  <a class="dropdown-item" href="#"><i class="dripicons-wallet text-muted"></i> My Wallet</a> -->
-                                        <a class="dropdown-item" href="#"><span class="badge badge-success pull-right m-t-5"></span><i class="dripicons-gear text-muted"></i> Configurar</a>
+                                       <!-- <a class="dropdown-item" href="#"><span class="badge badge-success pull-right m-t-5"></span><i class="dripicons-gear text-muted"></i> Configurar</a> -->
                                       <!--  <a class="dropdown-item" href="#"><i class="dripicons-lock text-muted"></i> Lock screen</a> -->
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="<?php echo $logoutAction ?>"><i class="dripicons-exit text-muted"></i> Salir</a>
