@@ -3,8 +3,8 @@
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "0";
-$MM_donotCheckaccess = "false";
+$MM_authorizedUsers = "";
+$MM_donotCheckaccess = "true";
 
 // *** Restrict Access To Page: Grant or deny access to this page
 function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) { 
@@ -25,14 +25,14 @@ function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) {
     if (in_array($UserGroup, $arrGroups)) { 
       $isValid = true; 
     } 
-    if (($strUsers == "") && false) { 
+    if (($strUsers == "") && true) { 
       $isValid = true; 
     } 
   } 
   return $isValid; 
 }
 
-$MM_restrictGoTo = "index.php";
+$MM_restrictGoTo = "index_error.php";
 if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
   $MM_qsChar = "?";
   $MM_referrer = $_SERVER['PHP_SELF'];
@@ -80,56 +80,34 @@ $editFormAction = $_SERVER['PHP_SELF'];
 if (isset($_SERVER['QUERY_STRING'])) {
   $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
 }
-	$prod = $_POST['productos5'];
- 
-	$texto_productos = implode(', ', $prod);
-	$statusok = 2;
 
-
-if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form")) {
-  $insertSQL = sprintf("INSERT INTO Solicitud (nombre, apellido, fecha_solicitud, pickup, productos, status) VALUES (%s, %s, %s, %s, %s, %s)",
-                       GetSQLValueString($_POST['nombre'], "text"),
-                       GetSQLValueString($_POST['apellido'], "text"),
-                       GetSQLValueString($_POST['fecha_solicitud'], "text"),
-                       GetSQLValueString($_POST['pickup'], "text"),
-					   GetSQLValueString($texto_productos, "text"),
-                       GetSQLValueString($statusok, "int"));
+if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "form")) {
+  $updateSQL = sprintf("UPDATE Usuarios SET password=%s WHERE id_user=%s",
+                       GetSQLValueString($_POST['passwd'], "text"),
+                       GetSQLValueString($_POST['id'], "int"));
 
   mysql_select_db($database_conexion, $conexion);
-  $Result1 = mysql_query($insertSQL, $conexion) or die(mysql_error());
+  $Result1 = mysql_query($updateSQL, $conexion) or die(mysql_error());
 
-  $insertGoTo = "solicitar_insumo.php";
+  $updateGoTo = "perfil.php";
   if (isset($_SERVER['QUERY_STRING'])) {
-    $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
-    $insertGoTo .= $_SERVER['QUERY_STRING'];
+    $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
+    $updateGoTo .= $_SERVER['QUERY_STRING'];
   }
-  header(sprintf("Location: %s", $insertGoTo));
+  header(sprintf("Location: %s", $updateGoTo));
 }
 
-mysql_select_db($database_conexion, $conexion);
-$query_almacen1listado = "SELECT * FROM Productos_almacen1";
-$almacen1listado = mysql_query($query_almacen1listado, $conexion) or die(mysql_error());
-$row_almacen1listado = mysql_fetch_assoc($almacen1listado);
-$totalRows_almacen1listado = mysql_num_rows($almacen1listado);
-
-$colname_usuario1 = "-1";
+$colname_mostrar_datos_usuario = "-1";
 if (isset($_SESSION['MM_Username'])) {
-  $colname_usuario1 = $_SESSION['MM_Username'];
+  $colname_mostrar_datos_usuario = $_SESSION['MM_Username'];
 }
 mysql_select_db($database_conexion, $conexion);
-$query_usuario1 = sprintf("SELECT nombre, apellido FROM Usuarios WHERE email = %s", GetSQLValueString($colname_usuario1, "text"));
-$usuario1 = mysql_query($query_usuario1, $conexion) or die(mysql_error());
-$row_usuario1 = mysql_fetch_assoc($usuario1);
-$totalRows_usuario1 = mysql_num_rows($usuario1);
-$query_Listado_almacen1 = "SELECT * FROM Productos_almacen1";
-$Listado_almacen1 = mysql_query($query_Listado_almacen1, $conexion) or die(mysql_error());
-$row_Listado_almacen1 = mysql_fetch_assoc($Listado_almacen1);
-$totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
+$query_mostrar_datos_usuario = sprintf("SELECT * FROM Usuarios WHERE email = %s", GetSQLValueString($colname_mostrar_datos_usuario, "text"));
+$mostrar_datos_usuario = mysql_query($query_mostrar_datos_usuario, $conexion) or die(mysql_error());
+$row_mostrar_datos_usuario = mysql_fetch_assoc($mostrar_datos_usuario);
+$totalRows_mostrar_datos_usuario = mysql_num_rows($mostrar_datos_usuario);
 ?>
 <?php include 'layouts/header.php'; ?>
-
-    <!-- Select 2 -->
-    <link href="public/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
 <?php include 'layouts/headerStyle.php'; ?>
 
@@ -154,7 +132,7 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                             <!-- Search input -->
                             <div class="search-wrap" id="search-wrap">
                                 <div class="search-bar">
-                                    <input class="search-input" type="search" placeholder="Buscar" />
+                                    <input class="search-input" type="search" placeholder="Search" />
                                     <a href="#" class="close-search toggle-search" data-target="#search-wrap">
                                         <i class="mdi mdi-close-circle"></i>
                                     </a>
@@ -174,8 +152,8 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                                         <i class="mdi mdi-fullscreen noti-icon"></i>
                                     </a>
                                 </li>
-                                <!-- language
-                                <li class="list-inline-item dropdown notification-list hidden-xs-down">
+                                <!-- language-->
+                               <!-- <li class="list-inline-item dropdown notification-list hidden-xs-down">
                                     <a class="nav-link dropdown-toggle arrow-none waves-effect text-muted" data-toggle="dropdown" href="#" role="button"
                                        aria-haspopup="false" aria-expanded="false">
                                         English <img src="public/assets/images/flags/us_flag.jpg" class="ml-2" height="16" alt=""/>
@@ -193,37 +171,37 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                                     <a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#" role="button"
                                        aria-haspopup="false" aria-expanded="false">
                                         <i class="ion-ios7-bell noti-icon"></i>
-                                        <span class="badge badge-danger noti-icon-badge">2</span>
+                                        <span class="badge badge-danger noti-icon-badge">3</span>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-arrow dropdown-menu-lg">
                                         <!-- item-->
                                         <div class="dropdown-item noti-title">
-                                            <h5>Notificaciones (2)</h5>
+                                            <h5>Notification (3)</h5>
                                         </div>
 
                                         <!-- item-->
                                         <a href="javascript:void(0);" class="dropdown-item notify-item active">
-                                            <div class="notify-icon bg-success"><i class="ion-ios7-bell noti-icon"></i></div>
-                                            <p class="notify-details"><b>Solicitud de material</b><small class="text-muted">Entrega de material pendiente.</small></p>
+                                            <div class="notify-icon bg-success"><i class="mdi mdi-cart-outline"></i></div>
+                                            <p class="notify-details"><b>Your order is placed</b><small class="text-muted">Dummy text of the printing and typesetting industry.</small></p>
                                         </a>
 
                                         <!-- item-->
                                         <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                            <div class="notify-icon bg-warning"><i class="ion-ios7-bell noti-icon"></i></div>
-                                            <p class="notify-details"><b>Solicitud de material</b><small class="text-muted">Entrega de material pendiente.</small></p>
+                                            <div class="notify-icon bg-warning"><i class="mdi mdi-message"></i></div>
+                                            <p class="notify-details"><b>New Message received</b><small class="text-muted">You have 87 unread messages</small></p>
                                         </a>
 
-                                        <!-- item
+                                        <!-- item-->
                                         <a href="javascript:void(0);" class="dropdown-item notify-item">
                                             <div class="notify-icon bg-info"><i class="mdi mdi-martini"></i></div>
                                             <p class="notify-details"><b>Your item is shipped</b><small class="text-muted">It is a long established fact that a reader will</small></p>
                                         </a>
 
-
+                                        <!-- All-->
                                         <a href="javascript:void(0);" class="dropdown-item notify-item">
                                             View All
                                         </a>
--->
+
                                     </div>
                                 </li>
                                 <!-- User-->
@@ -233,13 +211,13 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                                         <img src="public/assets/images/users/avatar-1.jpg" alt="user" class="rounded-circle">
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right profile-dropdown ">
-                                        <a class="dropdown-item" href="#"><i class="dripicons-user text-muted"></i> Perfil</a>
-                                      <!--  <a class="dropdown-item" href="#"><i class="dripicons-wallet text-muted"></i> My Wallet</a> -->
-                                        <a class="dropdown-item" href="#"><span class="badge badge-success pull-right m-t-5"></span><i class="dripicons-gear text-muted"></i> Configurar</a>
-                                      <!--  <a class="dropdown-item" href="#"><i class="dripicons-lock text-muted"></i> Lock screen</a> -->
+                                        <a class="dropdown-item" href="#"><i class="dripicons-user text-muted"></i> Profile</a>
+                                       <!-- <a class="dropdown-item" href="#"><i class="dripicons-wallet text-muted"></i> My Wallet</a>
+                                        <a class="dropdown-item" href="#"><span class="badge badge-success pull-right m-t-5">5</span><i class="dripicons-gear text-muted"></i> Settings</a>
+                                        <a class="dropdown-item" href="#"><i class="dripicons-lock text-muted"></i> Lock screen</a>
                                         <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item" href="#"><i class="dripicons-exit text-muted"></i> Salir</a>
-                                    </div>
+                                        <a class="dropdown-item" href="#"><i class="dripicons-exit text-muted"></i> Logout</a>
+                                    </div> -->
                                 </li>
                             </ul>
 
@@ -251,7 +229,7 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                                     </button>
                                 </li>
                                 <li class="hide-phone list-inline-item app-search">
-                                    <h3 class="page-title">Solicitar insumos</h3>
+                                    <h3 class="page-title">Perfil</h3>
                                 </li>
                             </ul>
 
@@ -271,116 +249,100 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
 
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="card m-b-20">
+                                    <div class="card">
                                         <div class="card-body">
-
-                                            <h4 class="mt-0 header-title">Información</h4>
-                                            <p class="text-muted m-b-30 font-14">Selecciona las opciones a continuación: </p>
-
-                                  <form method="POST" action="<?php echo $editFormAction; ?>" name="form">
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        
-														
-                                                        <div class="form-group">
-															<table width="200">
-															  <tr>
-															    <td>
-																	<table width="200" border="0">
-																		<?php do { ?>
-  																			<tr>
-																			
-    																			<td>
-																					<label>
-     																			 		<input type="checkbox" name="productos5[]" value="<?php echo $row_almacen1listado['producto']; ?> " >
-     																				</label>  <?php echo $row_almacen1listado['producto']; ?>
-																				</td>
-																			 
-  																			</tr>
-																				
-                                                           				<?php } while ($row_almacen1listado = mysql_fetch_assoc($almacen1listado)); ?>	
-                                                           					
-																		
-																
-																</td>
-														    </tr>
-														  </table>
-															
-															
-															
-                                                         </div>
-                                                          
-														
-                                                       	  <div class="form-group">
-                                                            <label for="metatitle">PickUp</label>
-                                                            <input id="pickup" name="pickup" type="datetime-local" class="form-control">
-                                                       	  </div>
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="text-center">
+                                                        <h5>Datos personales </h5>
+                                                        <p class="text-muted">Conociendote te conocemos</p>
                                                     </div>
-													
-                                                    <input type="hidden" name="nombre" value="<?php echo $row_usuario1['nombre']; ?>">
-													<input type="hidden" name="status" value="0">
-													<input type="hidden" name="apellido" value="<?php echo $row_usuario1['apellido']; ?>">
-													<?php $lafechadesolicitud = date("d / m / Y"); ?>
-													<input type="hidden" name="fecha_solicitud" value="<?php echo $lafechadesolicitud ; ?>"  >
-													
-                                                    </div>
-												
                                                 </div>
-                                       
-                                     </div>  
+                                            </div>
 
-                                                <button type="submit" class="btn btn-success waves-effect waves-light">Agregar</button>
-                                                <button type="submit" class="btn btn-secondary waves-effect">Cancelar</button>
-                                                <input type="hidden" name="MM_insert" value="form">
-                                    </form>
-
+                                            <div class="row m-t-40">
+                                                <div class="col-md-4">
+                                                    <div>
+                                                        <h6 class="font-14">Nombre</h6>
+                                                        <p class="text-muted"><?php echo $row_mostrar_datos_usuario['nombre']; ?></p>
+                                                    </div>
+                                                    <div class="pt-3">
+                                                        <h6 class="font-14">Apellido</h6>
+                                                        <p class="text-muted"> <?php echo $row_mostrar_datos_usuario['apellido']; ?></p>
+                                                    </div>
+                                                    <div class="pt-3">
+                                                        <h6 class="font-14">Unidad Académica</h6>
+                                                        <p class="text-muted"><?php echo $row_mostrar_datos_usuario['unidad_academica']; ?> </p>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <div class="col-md-8">
+													<div class="pt-3">
+                                                        <h6 class="font-14">Email</h6>
+                                                        <p class="text-muted"><?php echo $row_mostrar_datos_usuario['email']; ?></p>
+                                                    </div>
+                                                    <div class="pt-3">
+                                                        <h6 class="font-14">Password</h6>
+                                                        <p class="text-muted"> <?php echo $row_mostrar_datos_usuario['password']; ?></p>
+                                                    </div>
+													
+												  <form method="POST" action="<?php echo $editFormAction; ?>" name="form">
+													<label>Nueva</label> <input type="text" name="passwd">
+														
+														<input name="id" type="hidden" value="<?php echo $row_mostrar_datos_usuario['id_user']; ?>">
+														<button type="submit"> enviar</button>
+														<input type="hidden" name="MM_update" value="form">
+													</form>
+													
+                                                  <!--  <form class="form-custom">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="sr-only" for="username">Name</label>
+                                                                    <input type="text" class="form-control" id="username" placeholder="Your Name" required="">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="sr-only" for="useremail">Email address</label>
+                                                                   <input type="email" class="form-control" id="useremail" placeholder="Your Email" required="">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="sr-only" for="usersubject">Subject</label>
+                                                                    <input type="text" class="form-control" id="usersubject" placeholder="Subject" required="">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <textarea class="form-control" rows="5" placeholder="Your Message...."></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-12 text-center">
+                                                                <button type="button" class="btn btn-primary waves-effect waves-light">Send Message</button>
+                                                            </div>
+                                                        </div>
+                                                    </form> -->
+                                                </div>
+                                            </div>
                                         </div>
-							</div> 
-
-                                   <!-- <div class="card">
-                                        <div class="card-body">
-
-                                            <h4 class="mt-0 header-title">Meta Data</h4>
-                                            <p class="text-muted m-b-30 font-14">Fill all information below</p>
-
-                                            <form>
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="metatitle">Meta title</label>
-                                                            <input id="metatitle" name="productname" type="text" class="form-control">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="metakeywords">Meta Keywords</label>
-                                                            <input id="metakeywords" name="manufacturername" type="text" class="form-control">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="metadescription">Meta Description</label>
-                                                            <textarea class="form-control" id="metadescription" rows="5"></textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <button type="submit" class="btn btn-success waves-effect waves-light">Save Changes</button>
-                                                <button type="submit" class="btn btn-secondary waves-effect">Cancel</button>
-
-                                            </form>
-
-                                        </div> -->
                                     </div>
                                 </div>
                             </div>
-
                         </div><!-- container -->
 
                     </div> <!-- Page content Wrapper -->
 
                 </div> <!-- content -->
 
-                
+                <?php include 'layouts/footer.php'; ?>
 
             </div>
             <!-- End Right content here -->
@@ -390,23 +352,11 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
 
         <?php include 'layouts/footerScript.php'; ?>
 
-        <!-- select2 js -->
-        <script src="public/plugins/select2/js/select2.min.js"></script>
-
         <!-- App js -->
         <script src="public/assets/js/app.js"></script>
-
-        <script>
-            // Select2
-            $(".select2").select2();
-        </script>
 
     </body>
 </html>
 <?php
-mysql_free_result($almacen1listado);
-
-mysql_free_result($usuario1);
-
-mysql_free_result($Listado_almacen1);
+mysql_free_result($mostrar_datos_usuario);
 ?>

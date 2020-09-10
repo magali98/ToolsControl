@@ -104,6 +104,28 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
+$editFormAction = $_SERVER['PHP_SELF'];
+if (isset($_SERVER['QUERY_STRING'])) {
+  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+}
+
+if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "cambio status")) {
+  $updateSQL = sprintf("UPDATE Solicitud SET status=%s, devolucion=%s WHERE id=%s",
+                       GetSQLValueString($_POST['status'], "int"),
+                       GetSQLValueString($_POST['fecha-devolucion'], "text"),
+                       GetSQLValueString($_POST['id'], "int"));
+
+  mysql_select_db($database_conexion, $conexion);
+  $Result1 = mysql_query($updateSQL, $conexion) or die(mysql_error());
+
+  $updateGoTo = "index_almacen1.php";
+  if (isset($_SERVER['QUERY_STRING'])) {
+    $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
+    $updateGoTo .= $_SERVER['QUERY_STRING'];
+  }
+  header(sprintf("Location: %s", $updateGoTo));
+}
+
 $colname_Usuario = "-1";
 if (isset($_SESSION['MM_Username'])) {
   $colname_Usuario = $_SESSION['MM_Username'];
@@ -127,16 +149,26 @@ $row_contar_usuarios = mysql_fetch_assoc($contar_usuarios);
 $totalRows_contar_usuarios = mysql_num_rows($contar_usuarios);
 
 mysql_select_db($database_conexion, $conexion);
-$query_consultar_notificaciones = "SELECT * FROM Solicitud WHERE status = 2";
+$query_consultar_notificaciones = "SELECT * FROM Solicitud";
 $consultar_notificaciones = mysql_query($query_consultar_notificaciones, $conexion) or die(mysql_error());
 $row_consultar_notificaciones = mysql_fetch_assoc($consultar_notificaciones);
 $totalRows_consultar_notificaciones = mysql_num_rows($consultar_notificaciones);
 
 mysql_select_db($database_conexion, $conexion);
-$query_Solicitudes_almacen1 = "SELECT * FROM Solicitud WHERE status = 0";
+$query_Solicitudes_almacen1 = "SELECT * FROM Solicitud";
 $Solicitudes_almacen1 = mysql_query($query_Solicitudes_almacen1, $conexion) or die(mysql_error());
 $row_Solicitudes_almacen1 = mysql_fetch_assoc($Solicitudes_almacen1);
 $totalRows_Solicitudes_almacen1 = mysql_num_rows($Solicitudes_almacen1);
+
+$colname_cambio_status = "-1";
+if (isset($_GET['oper'])) {
+  $colname_cambio_status = $_GET['oper'];
+}
+mysql_select_db($database_conexion, $conexion);
+$query_cambio_status = sprintf("SELECT * FROM Solicitud WHERE id = %s", GetSQLValueString($colname_cambio_status, "int"));
+$cambio_status = mysql_query($query_cambio_status, $conexion) or die(mysql_error());
+$row_cambio_status = mysql_fetch_assoc($cambio_status);
+$totalRows_cambio_status = mysql_num_rows($cambio_status);
 ?>
 <?php include 'layouts/header.php'; ?>
     <!-- C3 charts css -->
@@ -250,56 +282,7 @@ $totalRows_Solicitudes_almacen1 = mysql_num_rows($Solicitudes_almacen1);
                          PAGE CONTENT START
                          ================== -->
 
-                    <div class="page-content-wrapper">
-
-                        <div class="container-fluid">
-
-                            <div class="row">
-                                <div class="col-md-6 col-xl-3">
-                                    <div class="mini-stat clearfix bg-white">
-                                        <span class="mini-stat-icon bg-purple mr-0 float-right"><i class="mdi mdi-basket"></i></span>
-                                        <div class="mini-stat-info">
-                                            <span class="counter text-purple"><?php echo $totalRows_almacen1 ?> </span>
-                                            Productos disponibles
-                                        </div>
-                                        <div class="clearfix"></div>
-                                        <p class=" mb-0 m-t-20 text-muted">Productos Totales: <?php echo $totalRows_almacen1 ?> <span class="pull-right"> <!--<i class="fa fa-caret-up m-r-5"></i>10.25%</span>--></p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-3">
-                                    <div class="mini-stat clearfix bg-white">
-                                        <span class="mini-stat-icon bg-blue-grey mr-0 float-right"><i class="mdi mdi-black-mesa"></i></span>
-                                        <div class="mini-stat-info">
-                                            <span class="counter text-blue-grey"><?php echo $totalRows_consultar_notificaciones ?></span>
-                                            Solicitudes Pendientes
-                                        </div>
-                                        <div class="clearfix"></div>
-                                        <p class="text-muted mb-0 m-t-20">Total de solicitudes: <?php echo $totalRows_consultar_notificaciones ?> <span class="pull-right"></p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-3">
-                                    <div class="mini-stat clearfix bg-white">
-                                        <span class="mini-stat-icon bg-brown mr-0 float-right"><i class="mdi mdi-buffer"></i></span>
-                                        <div class="mini-stat-info">
-                                            <span class="counter text-brown">1</span>
-                                            Usuarios Activos
-                                        </div>
-                                        <div class="clearfix"></div>
-                                        <p class="text-muted mb-0 m-t-20">Total de usuarios: <?php echo $totalRows_contar_usuarios ?> <span class="pull-right"></p>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-3">
-                                    <div class="mini-stat clearfix bg-white">
-                                        <span class="mini-stat-icon bg-teal mr-0 float-right"><i class="mdi mdi-coffee"></i></span>
-                                        <div class="mini-stat-info">
-                                            <span class="counter text-teal">388 Hrs.</span>
-                                            Uso continuo
-                                        </div>
-                                        <div class="clearfix"></div>
-                                        <p class="text-muted mb-0 m-t-20">Mantenimiento programado: 1,872 Hrs <span class="pull-right"></p>
-                                    </div>
-                                </div>
-                            </div>
+                    
 
 
                      <!-- INFORMACION TABLA -->
@@ -309,50 +292,76 @@ $totalRows_Solicitudes_almacen1 = mysql_num_rows($Solicitudes_almacen1);
                                     <div class="card m-b-20">
                                         <div class="card-body">
                                             <h4 class="mt-0 m-b-30 header-title">Esperando devolución:</h4>
+												
+											<center> <h4> INFORMACIÓN ADICIONAL</h4></center>
+											<center>
+											<div class="col-lg-6">
+                                    			<div class="card m-b-20">
+                                        			<div class="card-body">
 
-                                            <div class="table-responsive">
-                                                
-                                                <table class="table table-vertical mb-0">
-                                                    
-                                                    <tbody>
-														<?php do { ?>
-                                                     
-														
-														<tr>
-                                                        <td>
-                                                          <?php $contar = $contar+1; echo($contar.'  .-'); ?>
-                                                            <?php echo $row_Solicitudes_almacen1['nombre']; ?> <?php echo $row_Solicitudes_almacen1['apellido']; ?>
-                                                          </td>
-                                                        <td><i class="mdi mdi-checkbox-blank-circle text-warning"></i> PRESTAMO</td>
-                                                        <td>
-                                                          <?php echo $row_Solicitudes_almacen1['productos']; ?>
-                                                          <!-- <p class="m-0 text-muted font-14">Articulos</p> -->
-                                                          </td>
-                                                        <td>
-                                                          <?php echo $row_Solicitudes_almacen1['fecha_solicitud']; ?>
-                                                          <!-- <p class="m-0 text-muted font-14">Entrega</p>  -->
-                                                          </td>
-                                                       		 
-														 		 <td>
+                                            			<div class="table-responsive">
+                                                			<table class="table mb-0">
+                                                   			
+                                                   			 <tr>
+                                                       			 <th>Nombre:</th>
+                                                       			 <th><?php echo $row_cambio_status['nombre']; ?></th>
+                                                       			 
+                                                   			 </tr>
+                                                   			 
+                                                   			 <tbody>
+                                                   				 <tr>
+                                                        			<th scope="row">Productos: </th>
+                                                       				 <td><?php echo $row_cambio_status['productos']; ?></td>
+                                                       				 
+                                                   				 </tr>
+                                                   				 <tr>
+                                                       				 <th scope="row">Fecha de solicitud: </th>
+                                                       				 <td><?php echo $row_cambio_status['fecha_solicitud']; ?></td>
+                                                       				 
+                                                   				 </tr>
+                                                   				 <tr>
+                                                       				 <th scope="row">Estatus: </th>
+																	 <?php if($row_cambio_status['status'] == 0 )
 																	 
-																	 <?php $lafechadedevolucion = date("d / m / Y"); ?> 
-														 			 <input type="hidden" name="fecha-devolucion" value="<?php echo $lafechadedevolucion ; ?>">  
-																	 <a href="confirmar-recepcion.php?oper=<?php echo $row_Solicitudes_almacen1['id']; ?>"> recibir</a>
-                                                          		<!--	<button type="submit" class="btn btn-secondary btn-sm waves-effect" >Recibir</button> -->
-                                                         		 </td>
-															 
-                                                     	 </tr>
-                                                     
-                                                      
-                                                       <?php } while ($row_Solicitudes_almacen1 = mysql_fetch_assoc($Solicitudes_almacen1)); ?>
-                                                      
-                                                      
-                                                      
-                                                      
-                                                      </tbody>
-                                                  </table>
-                                                 
-                                            </div>
+																	{
+																		$imprime = 'PRESTAMO';
+																	}
+																	 else{
+																		 $imprime = 'OK';
+																	 }
+																	 
+																	 
+																	 ?>
+                                                       				 <td><?php echo $imprime;  ?></td>
+                                                       				 
+																	 <?php $lafechadedevolucion = date("d / m / Y"); ?>
+                                                   				 </tr>
+																 <!-- FORM -->
+																 <tr>
+                                                       				 <th scope="row">
+																		 <form method="POST" action="<?php echo $editFormAction; ?>" name="cambio status">
+																			 <input type="hidden" name="fecha-devolucion" value="<?php echo $lafechadedevolucion ; ?>">
+																			 <input type="hidden" name="status" value="1">
+																			 <input type="hidden" name="id" value="<?php echo $row_cambio_status['id']; ?>">
+																		 	<button type="submit" class="btn btn-secondary btn-sm waves-effect">Recibir</button>
+																		 	<input type="hidden" name="MM_update" value="cambio status"> 
+																		 </form>
+																		 
+																	 </th>
+                                                       				 <td> <a href="index_almacen1.php"> Volver </a></td>
+                                                       				 
+                                                   				 </tr>
+                                                   			 </tbody>
+                                               			 </table>
+                                           			 </div>
+
+                                        		</div>
+														
+                                    		</div>
+                               		 </div> <!-- end col -->
+											</center>
+											<!-- FIN EDICION DATOS -->
+                                           
                                         </div>
                                     </div>
                                 </div>
@@ -513,4 +522,6 @@ mysql_free_result($contar_usuarios);
 mysql_free_result($consultar_notificaciones);
 
 mysql_free_result($Solicitudes_almacen1);
+
+mysql_free_result($cambio_status);
 ?>

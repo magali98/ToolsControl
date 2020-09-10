@@ -3,7 +3,7 @@
 if (!isset($_SESSION)) {
   session_start();
 }
-$MM_authorizedUsers = "0";
+$MM_authorizedUsers = "2";
 $MM_donotCheckaccess = "false";
 
 // *** Restrict Access To Page: Grant or deny access to this page
@@ -32,7 +32,7 @@ function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) {
   return $isValid; 
 }
 
-$MM_restrictGoTo = "index.php";
+$MM_restrictGoTo = "index_admin.php";
 if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
   $MM_qsChar = "?";
   $MM_referrer = $_SERVER['PHP_SELF'];
@@ -76,71 +76,42 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
-$editFormAction = $_SERVER['PHP_SELF'];
-if (isset($_SERVER['QUERY_STRING'])) {
-  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
-}
-	$prod = $_POST['productos5'];
- 
-	$texto_productos = implode(', ', $prod);
-	$statusok = 2;
-
-
-if ((isset($_POST["MM_insert"])) && ($_POST["MM_insert"] == "form")) {
-  $insertSQL = sprintf("INSERT INTO Solicitud (nombre, apellido, fecha_solicitud, pickup, productos, status) VALUES (%s, %s, %s, %s, %s, %s)",
-                       GetSQLValueString($_POST['nombre'], "text"),
-                       GetSQLValueString($_POST['apellido'], "text"),
-                       GetSQLValueString($_POST['fecha_solicitud'], "text"),
-                       GetSQLValueString($_POST['pickup'], "text"),
-					   GetSQLValueString($texto_productos, "text"),
-                       GetSQLValueString($statusok, "int"));
-
-  mysql_select_db($database_conexion, $conexion);
-  $Result1 = mysql_query($insertSQL, $conexion) or die(mysql_error());
-
-  $insertGoTo = "solicitar_insumo.php";
-  if (isset($_SERVER['QUERY_STRING'])) {
-    $insertGoTo .= (strpos($insertGoTo, '?')) ? "&" : "?";
-    $insertGoTo .= $_SERVER['QUERY_STRING'];
-  }
-  header(sprintf("Location: %s", $insertGoTo));
-}
+mysql_select_db($database_conexion, $conexion);
+$query_consulta_solicitud = "SELECT * FROM Solicitud WHERE status = 2";
+$consulta_solicitud = mysql_query($query_consulta_solicitud, $conexion) or die(mysql_error());
+$row_consulta_solicitud = mysql_fetch_assoc($consulta_solicitud);
+$totalRows_consulta_solicitud = mysql_num_rows($consulta_solicitud);
 
 mysql_select_db($database_conexion, $conexion);
-$query_almacen1listado = "SELECT * FROM Productos_almacen1";
-$almacen1listado = mysql_query($query_almacen1listado, $conexion) or die(mysql_error());
-$row_almacen1listado = mysql_fetch_assoc($almacen1listado);
-$totalRows_almacen1listado = mysql_num_rows($almacen1listado);
+$query_solicitud_2 = "SELECT * FROM Solicitud WHERE status = 2";
+$solicitud_2 = mysql_query($query_solicitud_2, $conexion) or die(mysql_error());
+$row_solicitud_2 = mysql_fetch_assoc($solicitud_2);
+$totalRows_solicitud_2 = mysql_num_rows($solicitud_2);
 
-$colname_usuario1 = "-1";
-if (isset($_SESSION['MM_Username'])) {
-  $colname_usuario1 = $_SESSION['MM_Username'];
-}
 mysql_select_db($database_conexion, $conexion);
-$query_usuario1 = sprintf("SELECT nombre, apellido FROM Usuarios WHERE email = %s", GetSQLValueString($colname_usuario1, "text"));
-$usuario1 = mysql_query($query_usuario1, $conexion) or die(mysql_error());
-$row_usuario1 = mysql_fetch_assoc($usuario1);
-$totalRows_usuario1 = mysql_num_rows($usuario1);
-$query_Listado_almacen1 = "SELECT * FROM Productos_almacen1";
-$Listado_almacen1 = mysql_query($query_Listado_almacen1, $conexion) or die(mysql_error());
-$row_Listado_almacen1 = mysql_fetch_assoc($Listado_almacen1);
-$totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
+$query_solicitudes_pendientes_entrega = "SELECT * FROM Solicitud WHERE status = 2";
+$solicitudes_pendientes_entrega = mysql_query($query_solicitudes_pendientes_entrega, $conexion) or die(mysql_error());
+$row_solicitudes_pendientes_entrega = mysql_fetch_assoc($solicitudes_pendientes_entrega);
+$totalRows_solicitudes_pendientes_entrega = mysql_num_rows($solicitudes_pendientes_entrega);
+
+mysql_select_db($database_conexion, $conexion);
+$query_reporte = "SELECT * FROM Solicitud";
+$reporte = mysql_query($query_reporte, $conexion) or die(mysql_error());
+$row_reporte = mysql_fetch_assoc($reporte);
+$totalRows_reporte = mysql_num_rows($reporte);
 ?>
 <?php include 'layouts/header.php'; ?>
-
-    <!-- Select 2 -->
-    <link href="public/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
 
 <?php include 'layouts/headerStyle.php'; ?>
 
     <body class="fixed-left">
 
-    <?php include 'layouts/loader.php'; ?>
+        <?php include 'layouts/loader.php'; ?>
 
         <!-- Begin page -->
         <div id="wrapper">
 
-        <?php include 'layouts/navbar.php'; ?>
+        <?php include 'layouts/navbar_almacen1.php'; ?>
 
             <!-- Start right Content here -->
             <div class="content-page">
@@ -193,27 +164,22 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                                     <a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#" role="button"
                                        aria-haspopup="false" aria-expanded="false">
                                         <i class="ion-ios7-bell noti-icon"></i>
-                                        <span class="badge badge-danger noti-icon-badge">2</span>
+                                        <span class="badge badge-danger noti-icon-badge"><?php echo $totalRows_consulta_solicitud ?></span>
                                     </a>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-arrow dropdown-menu-lg">
                                         <!-- item-->
                                         <div class="dropdown-item noti-title">
-                                            <h5>Notificaciones (2)</h5>
+                                            <h5>Notificaciones ( <?php echo $totalRows_consulta_solicitud ?> )</h5>
                                         </div>
 
                                         <!-- item-->
+                                        <?php do { ?>
                                         <a href="javascript:void(0);" class="dropdown-item notify-item active">
                                             <div class="notify-icon bg-success"><i class="ion-ios7-bell noti-icon"></i></div>
-                                            <p class="notify-details"><b>Solicitud de material</b><small class="text-muted">Entrega de material pendiente.</small></p>
-                                        </a>
-
-                                        <!-- item-->
-                                        <a href="javascript:void(0);" class="dropdown-item notify-item">
-                                            <div class="notify-icon bg-warning"><i class="ion-ios7-bell noti-icon"></i></div>
-                                            <p class="notify-details"><b>Solicitud de material</b><small class="text-muted">Entrega de material pendiente.</small></p>
-                                        </a>
-
-                                        <!-- item
+                                            <p class="notify-details"><b>Solicitud de material</b><small class="text-muted">Entrega de material pendiente.</small></p>  
+                                          </a>
+                                       <?php } while ($row_consulta_solicitud = mysql_fetch_assoc($consulta_solicitud)); ?>
+<!-- item
                                         <a href="javascript:void(0);" class="dropdown-item notify-item">
                                             <div class="notify-icon bg-info"><i class="mdi mdi-martini"></i></div>
                                             <p class="notify-details"><b>Your item is shipped</b><small class="text-muted">It is a long established fact that a reader will</small></p>
@@ -251,7 +217,7 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                                     </button>
                                 </li>
                                 <li class="hide-phone list-inline-item app-search">
-                                    <h3 class="page-title">Solicitar insumos</h3>
+                                    <h3 class="page-title">TOTAL DE OPERACIONES</h3>
                                 </li>
                             </ul>
 
@@ -266,121 +232,77 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
                          ================== -->
 
                     <div class="page-content-wrapper">
+                     <div class="card-body">
+                                            <h4 class="mt-0 m-b-30 header-title">TOTAL ENTREGAS:</h4>
 
-                        <div class="container-fluid">
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="card m-b-20">
-                                        <div class="card-body">
-
-                                            <h4 class="mt-0 header-title">Información</h4>
-                                            <p class="text-muted m-b-30 font-14">Selecciona las opciones a continuación: </p>
-
-                                  <form method="POST" action="<?php echo $editFormAction; ?>" name="form">
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        
+                                            <div class="table-responsive">
+                                                
+                                                <table class="table table-vertical mb-0">
+                                                    
+                                                    <tbody>
 														
-                                                        <div class="form-group">
-															<table width="200">
-															  <tr>
-															    <td>
-																	<table width="200" border="0">
-																		<?php do { ?>
-  																			<tr>
-																			
-    																			<td>
-																					<label>
-     																			 		<input type="checkbox" name="productos5[]" value="<?php echo $row_almacen1listado['producto']; ?> " >
-     																				</label>  <?php echo $row_almacen1listado['producto']; ?>
-																				</td>
-																			 
-  																			</tr>
-																				
-                                                           				<?php } while ($row_almacen1listado = mysql_fetch_assoc($almacen1listado)); ?>	
-                                                           					
-																		
+                                                     <?php do { ?>
+  
+														
+														<tr>
+                                                        <td>
+                                                          <?php $contar = $contar+1; echo($contar.'  .-'); ?>
+                                                           <?php echo $row_reporte['nombre']; ?>
+														<?php echo $row_reporte['apellido']; ?>
+                                                          </td>
+															<?php if($row_reporte['status'] == 0 )
+	
+																	{
+																		$var_status = 'PENDIENTE';
+																	}
+															   	else
+																{
+																	if($row_reporte['status'] == 1)
+																	{
+																		$var_status = 'DEVUELTO';
+																	}
+																	
 																
-																</td>
-														    </tr>
-														  </table>
-															
-															
-															
-                                                         </div>
+																	$var_status = 'SOLICITADO';
+																}
+															?>
+                                                        <td> <?php echo $var_status; ?></td>
+                                                        <td>
+                                                          <?php echo $row_reporte['productos']; ?>
+                                                          <!-- <p class="m-0 text-muted font-14">Articulos</p> -->
+                                                          </td>
+                                                        <td><?php echo $row_reporte['pickup']; ?>
                                                           
-														
-                                                       	  <div class="form-group">
-                                                            <label for="metatitle">PickUp</label>
-                                                            <input id="pickup" name="pickup" type="datetime-local" class="form-control">
-                                                       	  </div>
-                                                    </div>
-													
-                                                    <input type="hidden" name="nombre" value="<?php echo $row_usuario1['nombre']; ?>">
-													<input type="hidden" name="status" value="0">
-													<input type="hidden" name="apellido" value="<?php echo $row_usuario1['apellido']; ?>">
-													<?php $lafechadesolicitud = date("d / m / Y"); ?>
-													<input type="hidden" name="fecha_solicitud" value="<?php echo $lafechadesolicitud ; ?>"  >
-													
-                                                    </div>
-												
-                                                </div>
-                                       
-                                     </div>  
-
-                                                <button type="submit" class="btn btn-success waves-effect waves-light">Agregar</button>
-                                                <button type="submit" class="btn btn-secondary waves-effect">Cancelar</button>
-                                                <input type="hidden" name="MM_insert" value="form">
-                                    </form>
-
+                                                          <!-- <p class="m-0 text-muted font-14">Entrega</p>  -->
+                                                          </td>
+                                                       		 
+														 		 <td>
+																	 
+																	 <?php echo $row_reporte['devolucion']; ?>
+                                                          		<!--	<button type="submit" class="btn btn-secondary btn-sm waves-effect" >Recibir</button> -->
+                                                         		 </td>
+															 
+                                                   	  </tr>
+                                                     
+                                                      
+                                                       
+                                                     
+  															<?php } while ($row_reporte = mysql_fetch_assoc($reporte)); ?>
+                                                      
+                                                      
+                                                      
+                                                  </tbody>
+                                                  </table>
+                                                 
+                                            </div>
                                         </div>
-							</div> 
-
-                                   <!-- <div class="card">
-                                        <div class="card-body">
-
-                                            <h4 class="mt-0 header-title">Meta Data</h4>
-                                            <p class="text-muted m-b-30 font-14">Fill all information below</p>
-
-                                            <form>
-                                                <div class="row">
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="metatitle">Meta title</label>
-                                                            <input id="metatitle" name="productname" type="text" class="form-control">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="metakeywords">Meta Keywords</label>
-                                                            <input id="metakeywords" name="manufacturername" type="text" class="form-control">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="col-sm-6">
-                                                        <div class="form-group">
-                                                            <label for="metadescription">Meta Description</label>
-                                                            <textarea class="form-control" id="metadescription" rows="5"></textarea>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <button type="submit" class="btn btn-success waves-effect waves-light">Save Changes</button>
-                                                <button type="submit" class="btn btn-secondary waves-effect">Cancel</button>
-
-                                            </form>
-
-                                        </div> -->
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div><!-- container -->
-
                     </div> <!-- Page content Wrapper -->
 
                 </div> <!-- content -->
 
-                
+                <?php include 'layouts/footer.php'; ?>
+
+
 
             </div>
             <!-- End Right content here -->
@@ -390,23 +312,17 @@ $totalRows_Listado_almacen1 = mysql_num_rows($Listado_almacen1);
 
         <?php include 'layouts/footerScript.php'; ?>
 
-        <!-- select2 js -->
-        <script src="public/plugins/select2/js/select2.min.js"></script>
-
         <!-- App js -->
         <script src="public/assets/js/app.js"></script>
-
-        <script>
-            // Select2
-            $(".select2").select2();
-        </script>
 
     </body>
 </html>
 <?php
-mysql_free_result($almacen1listado);
+mysql_free_result($consulta_solicitud);
 
-mysql_free_result($usuario1);
+mysql_free_result($solicitud_2);
 
-mysql_free_result($Listado_almacen1);
+mysql_free_result($solicitudes_pendientes_entrega);
+
+mysql_free_result($reporte);
 ?>

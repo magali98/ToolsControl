@@ -1,0 +1,1 @@
+﻿<?xml version="1.0" encoding="utf-8" ?><info>	<infoitem key="UD_mostrar_datos_usuario" value="name:acceso;datatype:int,name:email;datatype:string,name:password;datatype:string,name:nombre;datatype:string,name:apellido;datatype:string,name:unidad_academica;datatype:blob,name:id_user;datatype:int" /></info>

@@ -76,6 +76,27 @@ function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDe
 }
 }
 
+$editFormAction = $_SERVER['PHP_SELF'];
+if (isset($_SERVER['QUERY_STRING'])) {
+  $editFormAction .= "?" . htmlentities($_SERVER['QUERY_STRING']);
+}
+
+if ((isset($_POST["MM_update"])) && ($_POST["MM_update"] == "completar-entrega")) {
+  $updateSQL = sprintf("UPDATE Solicitud SET status=%s WHERE id=%s",
+                       GetSQLValueString($_POST['status'], "int"),
+                       GetSQLValueString($_POST['id'], "int"));
+
+  mysql_select_db($database_conexion, $conexion);
+  $Result1 = mysql_query($updateSQL, $conexion) or die(mysql_error());
+
+  $updateGoTo = "solicitud_admin.php";
+  if (isset($_SERVER['QUERY_STRING'])) {
+    $updateGoTo .= (strpos($updateGoTo, '?')) ? "&" : "?";
+    $updateGoTo .= $_SERVER['QUERY_STRING'];
+  }
+  header(sprintf("Location: %s", $updateGoTo));
+}
+
 mysql_select_db($database_conexion, $conexion);
 $query_consulta_solicitud = "SELECT * FROM Solicitud WHERE status = 2";
 $consulta_solicitud = mysql_query($query_consulta_solicitud, $conexion) or die(mysql_error());
@@ -93,6 +114,16 @@ $query_solicitudes_pendientes_entrega = "SELECT * FROM Solicitud WHERE status = 
 $solicitudes_pendientes_entrega = mysql_query($query_solicitudes_pendientes_entrega, $conexion) or die(mysql_error());
 $row_solicitudes_pendientes_entrega = mysql_fetch_assoc($solicitudes_pendientes_entrega);
 $totalRows_solicitudes_pendientes_entrega = mysql_num_rows($solicitudes_pendientes_entrega);
+
+$colname_confirmar_entrega = "-1";
+if (isset($_GET['oper'])) {
+  $colname_confirmar_entrega = $_GET['oper'];
+}
+mysql_select_db($database_conexion, $conexion);
+$query_confirmar_entrega = sprintf("SELECT * FROM Solicitud WHERE id = %s", GetSQLValueString($colname_confirmar_entrega, "int"));
+$confirmar_entrega = mysql_query($query_confirmar_entrega, $conexion) or die(mysql_error());
+$row_confirmar_entrega = mysql_fetch_assoc($confirmar_entrega);
+$totalRows_confirmar_entrega = mysql_num_rows($confirmar_entrega);
 ?>
 <?php include 'layouts/header.php'; ?>
 
@@ -227,58 +258,80 @@ $totalRows_solicitudes_pendientes_entrega = mysql_num_rows($solicitudes_pendient
 
                     <div class="page-content-wrapper">
                      <div class="card-body">
-                                            <h4 class="mt-0 m-b-30 header-title">Pendiente de entrega:</h4>
+                                           
+						 <div class="row">
+                                <div class="col-12">
+                                    <table class="body-wrap" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; width: 100%; background-color: #f6f6f6; margin: 0;" bgcolor="#f6f6f6">
+                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                            <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;" valign="top"></td>
+                                            <td class="container" width="600" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; display: block !important; max-width: 600px !important; clear: both !important; margin: 0 auto;" valign="top">
+                                                <div class="content" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; max-width: 600px; display: block; margin: 0 auto; padding: 20px;">
+                                                    <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px;  margin: 0; border: none;">
+                                                        <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                            <td class="content-wrap aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0;padding: 20px;border: 3px solid #1d1e3a;border-radius: 7px; background-color: #fff;" align="center" valign="top">
+                                                                <table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                        <td class="content-block" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">
+                                                                            <h2 class="aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,'Lucida Grande',sans-serif; box-sizing: border-box; font-size: 24px; color: #000; line-height: 1.2em; font-weight: 400; text-align: center; margin: 40px 0 0;" align="center">Tools <b>Control</b>.</h2>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                        <td class="content-block aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 20px;" align="center" valign="top">
+                                                                            <table class="invoice" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; text-align: left; width: 80%; margin: 40px auto;">
+                                                                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;" valign="top"><b><?php echo $row_confirmar_entrega['nombre']; ?> <?php echo $row_confirmar_entrega['apellido']; ?> </b>
+                                                                                        <br style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" />Fecha entrega: 
+                                                                                        <br style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;" /><?php echo $row_confirmar_entrega['pickup']; ?>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                                    <td style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 5px 0;" valign="top">
+                                                                                      <p> <b> PRODUCTOS: </b> </p>  <?php echo $row_confirmar_entrega['productos']; ?>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+																	
+																	<tr>
+																		<td>
+																			<form method="POST" action="<?php echo $editFormAction; ?>" name="completar-entrega">
+																				<input type="hidden" name="status" value="0">
+																				<input type="hidden" name="id" value="<?php echo $row_confirmar_entrega['id']; ?>">
+																				<center> <button type="submit" class="btn btn-secondary btn-sm waves-effect">Entregar</button> </center>
+																				<input type="hidden" name="MM_update" value="completar-entrega">
+																			</form>
+																		</td>
+																	</tr>
+																	
+                                                                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                        <td class="content-block aligncenter" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; text-align: center; margin: 0; padding: 0 0 20px;" align="center" valign="top">
+                                                                            <a href="solicitud_admin.php">Volver</a>
+                                                                        </td>
+                                                                    </tr>
+																	
+																	
 
-                                            <div class="table-responsive">
-                                                
-                                                <table class="table table-vertical mb-0">
-                                                    
-                                                    <tbody>
-														
-                                                     <?php do { ?>
-  
-														
-														<tr>
-                                                        <td>
-                                                          <?php $contar = $contar+1; echo($contar.'  .-'); ?>
-                                                            <?php echo $row_solicitudes_pendientes_entrega['nombre']; ?>
-															<?php echo $row_solicitudes_pendientes_entrega['apellido']; ?>
-                                                          </td>
-                                                        <td><i class="mdi mdi-checkbox-blank-circle text-danger"></i> POR ENTREGAR</td>
-                                                        <td>
-                                                          <?php echo $row_solicitudes_pendientes_entrega['productos']; ?>
-                                                          <!-- <p class="m-0 text-muted font-14">Articulos</p> -->
-                                                          </td>
-                                                        <td><?php echo $row_solicitudes_pendientes_entrega['pickup']; ?>
-                                                          
-                                                          <!-- <p class="m-0 text-muted font-14">Entrega</p>  -->
-                                                          </td>
-                                                       		 
-														 		 <td>
-																	 
-																	 <a href="confirmacion_admin1_entrega.php?oper=<?php echo $row_solicitudes_pendientes_entrega['id']; ?>"> Entregar</a>
-                                                          		<!--	<button type="submit" class="btn btn-secondary btn-sm waves-effect" >Recibir</button> -->
-                                                         		 </td>
-															 
-                                                   	  </tr>
-                                                     
-                                                      
-                                                       
-                                                      <?php } while ($row_solicitudes_pendientes_entrega = mysql_fetch_assoc($solicitudes_pendientes_entrega)); ?>
-                                                      
-                                                      
-                                                      
-                                                  </tbody>
-                                                  </table>
-                                                 
-                                            </div>
-                                        </div>
+                                                                    <tr style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                                                                        <td class="content-block" style="text-align: center;font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0;" valign="top">
+                                                                            © 2020 Tools-Control
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
                     </div> <!-- Page content Wrapper -->
 
                 </div> <!-- content -->
 
                 <?php include 'layouts/footer.php'; ?>
-
 
             </div>
             <!-- End Right content here -->
@@ -299,4 +352,6 @@ mysql_free_result($consulta_solicitud);
 mysql_free_result($solicitud_2);
 
 mysql_free_result($solicitudes_pendientes_entrega);
+
+mysql_free_result($confirmar_entrega);
 ?>

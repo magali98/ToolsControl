@@ -46,6 +46,10 @@
             <li>
                 <a href="solicitud_admin.php" class="waves-effect"><i class="mdi mdi-calendar-check"></i><span> Solicitudes </span></a>
             </li>
+			
+			<li>
+                <a href="reporte_admin1.php" class="waves-effect"><i class="mdi mdi-calendar-check"></i><span> Reportes </span></a>
+            </li>
 
 <!--            <li class="menu-title">Components</li>
 

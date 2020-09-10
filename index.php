@@ -131,7 +131,7 @@ if (isset($_POST['usuario'])) {
                                     <form METHOD="POST" class="login-form" action="<?php echo $loginFormAction; ?>" name="login">
                                         <div class="row">
                                             <div class="col-lg-12 mt-4">
-                                                <input type="email" class="form-control" placeholder="xxxx@itesm.mx" required="" name="usuario">
+                                                <input type="email" class="form-control" placeholder="xxxx@utez.edu.mx" required="" name="usuario">
                                             </div>
                                             <div class="col-lg-12 mt-4">
                                                 <input type="password" class="form-control" placeholder="Password" required="" name="passwd">

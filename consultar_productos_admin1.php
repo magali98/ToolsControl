@@ -277,8 +277,8 @@ $totalRows_consulta = mysql_num_rows($consulta);
                                                   <td>$<?php echo $row_consulta['costo']; ?>  </td>
                                                   <td><?php echo $row_consulta['fecha_alta']; ?></td>
                                                   <td>
-                                                    <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Edit"><i class="mdi mdi-pencil font-18"></i></a>
-                                                    <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete"><i class="mdi mdi-close font-18"></i></a>
+                                                    <a href="javascript:void(0);" class="m-r-15 text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Editar"><i class="mdi mdi-pencil font-18"></i></a>
+                                                    <a href="javascript:void(0);" class="text-muted" data-toggle="tooltip" data-placement="top" title="" data-original-title="Eliminar"><i class="mdi mdi-close font-18"></i></a>
                                                     </td>
                                                   </tr>
                                                 <?php } while ($row_consulta = mysql_fetch_assoc($consulta)); ?>

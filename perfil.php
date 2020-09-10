@@ -1,3 +1,91 @@
+<?php require_once('Connections/conexion.php'); ?>
+<?php
+if (!isset($_SESSION)) {
+  session_start();
+}
+$MM_authorizedUsers = "";
+$MM_donotCheckaccess = "true";
+
+// *** Restrict Access To Page: Grant or deny access to this page
+function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) { 
+  // For security, start by assuming the visitor is NOT authorized. 
+  $isValid = False; 
+
+  // When a visitor has logged into this site, the Session variable MM_Username set equal to their username. 
+  // Therefore, we know that a user is NOT logged in if that Session variable is blank. 
+  if (!empty($UserName)) { 
+    // Besides being logged in, you may restrict access to only certain users based on an ID established when they login. 
+    // Parse the strings into arrays. 
+    $arrUsers = Explode(",", $strUsers); 
+    $arrGroups = Explode(",", $strGroups); 
+    if (in_array($UserName, $arrUsers)) { 
+      $isValid = true; 
+    } 
+    // Or, you may restrict access to only certain users based on their username. 
+    if (in_array($UserGroup, $arrGroups)) { 
+      $isValid = true; 
+    } 
+    if (($strUsers == "") && true) { 
+      $isValid = true; 
+    } 
+  } 
+  return $isValid; 
+}
+
+$MM_restrictGoTo = "index_error.php";
+if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
+  $MM_qsChar = "?";
+  $MM_referrer = $_SERVER['PHP_SELF'];
+  if (strpos($MM_restrictGoTo, "?")) $MM_qsChar = "&";
+  if (isset($_SERVER['QUERY_STRING']) && strlen($_SERVER['QUERY_STRING']) > 0) 
+  $MM_referrer .= "?" . $_SERVER['QUERY_STRING'];
+  $MM_restrictGoTo = $MM_restrictGoTo. $MM_qsChar . "accesscheck=" . urlencode($MM_referrer);
+  header("Location: ". $MM_restrictGoTo); 
+  exit;
+}
+?>
+<?php
+if (!function_exists("GetSQLValueString")) {
+function GetSQLValueString($theValue, $theType, $theDefinedValue = "", $theNotDefinedValue = "") 
+{
+  if (PHP_VERSION < 6) {
+    $theValue = get_magic_quotes_gpc() ? stripslashes($theValue) : $theValue;
+  }
+
+  $theValue = function_exists("mysql_real_escape_string") ? mysql_real_escape_string($theValue) : mysql_escape_string($theValue);
+
+  switch ($theType) {
+    case "text":
+      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+      break;    
+    case "long":
+    case "int":
+      $theValue = ($theValue != "") ? intval($theValue) : "NULL";
+      break;
+    case "double":
+      $theValue = ($theValue != "") ? doubleval($theValue) : "NULL";
+      break;
+    case "date":
+      $theValue = ($theValue != "") ? "'" . $theValue . "'" : "NULL";
+      break;
+    case "defined":
+      $theValue = ($theValue != "") ? $theDefinedValue : $theNotDefinedValue;
+      break;
+  }
+  return $theValue;
+}
+}
+
+$colname_mostrar_datos_usuario = "-1";
+if (isset($_SESSION['MM_Username'])) {
+  $colname_mostrar_datos_usuario = $_SESSION['MM_Username'];
+}
+mysql_select_db($database_conexion, $conexion);
+$query_mostrar_datos_usuario = sprintf("SELECT * FROM Usuarios WHERE email = %s", GetSQLValueString($colname_mostrar_datos_usuario, "text"));
+$mostrar_datos_usuario = mysql_query($query_mostrar_datos_usuario, $conexion) or die(mysql_error());
+$row_mostrar_datos_usuario = mysql_fetch_assoc($mostrar_datos_usuario);
+$totalRows_mostrar_datos_usuario = mysql_num_rows($mostrar_datos_usuario);
+?>
 <?php include 'layouts/header.php'; ?>
 
 <?php include 'layouts/headerStyle.php'; ?>
@@ -155,26 +243,30 @@
                                                 <div class="col-md-4">
                                                     <div>
                                                         <h6 class="font-14">Nombre</h6>
-                                                        <p class="text-muted">Variable nombre</p>
+                                                        <p class="text-muted"><?php echo $row_mostrar_datos_usuario['nombre']; ?></p>
                                                     </div>
                                                     <div class="pt-3">
                                                         <h6 class="font-14">Apellido</h6>
-                                                        <p class="text-muted">Variable apellido</p>
+                                                        <p class="text-muted"> <?php echo $row_mostrar_datos_usuario['apellido']; ?></p>
                                                     </div>
                                                     <div class="pt-3">
                                                         <h6 class="font-14">Unidad Académica</h6>
-                                                        <p class="text-muted">Variable unidad académica</p>
+                                                        <p class="text-muted"><?php echo $row_mostrar_datos_usuario['unidad_academica']; ?> </p>
                                                     </div>
                                                     
                                                 </div>
                                                 <div class="col-md-8">
 													<div class="pt-3">
                                                         <h6 class="font-14">Email</h6>
-                                                        <p class="text-muted">Variable email</p>
+                                                        <p class="text-muted"><?php echo $row_mostrar_datos_usuario['email']; ?></p>
                                                     </div>
                                                     <div class="pt-3">
                                                         <h6 class="font-14">Password</h6>
-                                                        <p class="text-muted">Variable Password</p>
+                                                        <p class="text-muted"> <?php echo $row_mostrar_datos_usuario['password']; ?></p>
+                                                    </div>
+													 <div class="pt-3">
+                                                        <h6 class="font-14">¿Deseas cambiar tu contraseña?</h6>
+                                                        <p class="text-muted"> <a href="cambio-passwd.php"> Cambiar </a></p>
                                                     </div>
                                                   <!--  <form class="form-custom">
                                                         <div class="row">
@@ -239,3 +331,6 @@
 
     </body>
 </html>
+<?php
+mysql_free_result($mostrar_datos_usuario);
+?>
